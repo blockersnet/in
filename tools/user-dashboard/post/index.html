@@ -1,0 +1,2741 @@
+<!doctype html>
+<html lang="sw">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Mnyilinga — Admin Panel</title>
+    <link rel="icon" type="image/svg+xml" href="https://news.mnyilinga.co.tz/premium-icon-01.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      /* ================================================
+         RESET & ROOT
+      ================================================ */
+      *, *::before, *::after {
+        box-sizing: border-box; margin: 0; padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      :root {
+        --yellow:        #fdb913;
+        --yellow-hover:  #e8a500;
+        --yellow-glow:   rgba(253,185,19,0.12);
+        --yellow-glow2:  rgba(253,185,19,0.22);
+        --bg:            #080f1e;
+        --surface:       #0f1d33;
+        --surface2:      #142340;
+        --surface3:      #1a2d50;
+        --surface4:      #1e3560;
+        --border:        #1e3560;
+        --border-light:  #162d4a;
+        --border-bright: #2a4a7a;
+        --text:          #e8edf5;
+        --text-muted:    rgba(232,237,245,0.62);
+        --text-faint:    rgba(232,237,245,0.32);
+        --red:           #cb1111;
+        --red-bg:        rgba(203,17,17,0.12);
+        --red-light:     rgba(203,17,17,0.25);
+        --ok:            #22c55e;
+        --ok-bg:         rgba(34,197,94,0.12);
+        --warn:          #f59e0b;
+        --warn-bg:       rgba(245,158,11,0.12);
+        --link:          #60a5fa;
+        --font-display:  "Syne", system-ui, sans-serif;
+        --font-ui:       "Inter", system-ui, sans-serif;
+        --tr:            0.18s ease;
+      }
+      body {
+        font-family: var(--font-ui);
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        min-height: 100svh;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      body, * { user-select: none; -webkit-user-select: none; }
+      input, textarea, [contenteditable] { user-select: text; -webkit-user-select: text; }
+
+      /* ================================================
+         TOP NAVIGATION BAR
+      ================================================ */
+      #topbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 12px;
+        box-shadow: 0 1px 20px rgba(0,0,0,0.4);
+      }
+      .topbar-logo {
+        height: 28px;
+        width: auto;
+        display: block;
+        flex-shrink: 0;
+      }
+      .topbar-badge {
+        font-family: var(--font-display);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--yellow);
+        background: var(--yellow-glow);
+        border: 1px solid rgba(253,185,19,0.3);
+        padding: 3px 9px;
+        border-radius: 2px;
+      }
+      .topbar-sep {
+        width: 1px;
+        height: 28px;
+        background: var(--border);
+        margin: 0 4px;
+      }
+      .topbar-spacer { flex: 1; }
+      .topbar-actions { display: flex; align-items: center; gap: 10px; }
+      .topbar-time {
+        font-size: 12px;
+        font-family: var(--font-display);
+        font-weight: 500;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.05em;
+      }
+      #topbar-save-status {
+        font-size: 11px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        color: var(--ok);
+        padding: 3px 10px;
+        background: var(--ok-bg);
+        border: 1px solid rgba(34,197,94,0.25);
+        display: none;
+        letter-spacing: 0.05em;
+      }
+
+      /* ================================================
+         LAYOUT
+      ================================================ */
+      #page-body { display: block; }
+      @media (min-width: 800px) {
+        #page-body {
+          display: grid;
+          grid-template-columns: 210px 1fr;
+          max-width: 1440px;
+          margin: 0 auto;
+          align-items: start;
+        }
+      }
+      @media (min-width: 1100px) {
+        #page-body { grid-template-columns: 210px 1fr 248px; }
+      }
+
+      /* ================================================
+         SIDEBAR
+      ================================================ */
+      #wiki-sidebar { display: none; }
+      @media (min-width: 800px) {
+        #wiki-sidebar {
+          display: block;
+          position: sticky;
+          top: 52px;
+          border-right: 1px solid var(--border);
+          background: var(--surface);
+          min-height: calc(100svh - 52px);
+          padding: 20px 0;
+        }
+      }
+      .sb-section { margin-bottom: 20px; }
+      .sb-title {
+        font-family: var(--font-display);
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        padding: 0 16px;
+        margin-bottom: 6px;
+      }
+      .sb-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 16px;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 13px;
+        font-family: var(--font-ui);
+        font-weight: 500;
+        text-decoration: none;
+        border-left: 3px solid transparent;
+        transition: background var(--tr), border-color var(--tr), color var(--tr);
+      }
+      .sb-link:hover {
+        background: var(--surface2);
+        color: var(--text);
+        border-left-color: var(--border-bright);
+      }
+      .sb-link.active {
+        background: var(--yellow-glow);
+        border-left-color: var(--yellow);
+        color: var(--yellow);
+        font-weight: 600;
+      }
+      .sb-link svg {
+        width: 14px; height: 14px;
+        stroke: currentColor; fill: none;
+        flex-shrink: 0; opacity: 0.7;
+      }
+      .sb-divider {
+        height: 1px;
+        background: var(--border-light);
+        margin: 10px 0;
+      }
+      .sb-status-card {
+        margin: 0 12px;
+        padding: 12px 14px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        font-size: 11px;
+        color: var(--text-muted);
+        border-radius: 2px;
+      }
+      .sb-status-card b {
+        font-family: var(--font-display);
+        color: var(--text);
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .sb-status-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+        font-size: 12px;
+      }
+      .sb-status-val { font-weight: 700; color: var(--yellow); }
+
+      /* ================================================
+         MAIN CONTENT AREA
+      ================================================ */
+      #main-content { padding: 0; }
+      @media (min-width: 800px) {
+        #main-content {
+          border-left: 1px solid var(--border);
+          border-right: 1px solid var(--border);
+          min-height: calc(100svh - 52px);
+          background: var(--surface);
+        }
+      }
+
+      /* Page header */
+      .page-header {
+        padding: 20px 20px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .page-title {
+        font-family: var(--font-display);
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1.3;
+        margin-bottom: 6px;
+        letter-spacing: -0.02em;
+      }
+      .page-tabs { display: flex; gap: 0; margin-top: 12px; }
+      .page-tab {
+        padding: 7px 16px;
+        font-size: 12px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        border: 1px solid var(--border);
+        border-bottom: none;
+        background: var(--surface2);
+        color: var(--text-muted);
+        cursor: pointer;
+        margin-right: 2px;
+        position: relative;
+        top: 1px;
+        transition: background var(--tr), color var(--tr);
+      }
+      .page-tab.active {
+        background: var(--surface);
+        color: var(--yellow);
+        border-color: var(--border);
+        border-bottom: 1px solid var(--surface);
+      }
+
+      /* Form Sections */
+      .form-section {
+        padding: 22px 20px;
+        border-bottom: 1px solid var(--border-light);
+      }
+      .section-heading {
+        font-family: var(--font-display);
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 8px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .section-heading .accent-dot {
+        width: 6px; height: 6px;
+        background: var(--yellow);
+        border-radius: 50%;
+        flex-shrink: 0;
+        box-shadow: 0 0 6px var(--yellow);
+      }
+      .section-heading .anchor {
+        font-size: 12px;
+        color: var(--text-faint);
+        font-family: var(--font-ui);
+        font-weight: 400;
+        cursor: pointer;
+        text-decoration: none;
+        opacity: 0;
+        transition: 0.1s;
+        text-transform: none;
+        letter-spacing: 0;
+      }
+      .section-heading:hover .anchor { opacity: 1; }
+
+      label {
+        display: block;
+        font-size: 11px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        margin-bottom: 8px;
+      }
+
+      /* ================================================
+         COVER IMAGE UPLOAD
+      ================================================ */
+      .upload-zone {
+        width: 100%;
+        height: 160px;
+        border: 2px dashed var(--border-bright);
+        background: var(--surface2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: border-color var(--tr), background var(--tr);
+      }
+      .upload-zone:hover {
+        border-color: var(--yellow);
+        background: var(--yellow-glow);
+      }
+      .upload-zone svg {
+        width: 36px; height: 36px;
+        stroke: var(--text-faint);
+        margin-bottom: 10px;
+        transition: stroke var(--tr);
+      }
+      .upload-zone:hover svg { stroke: var(--yellow); }
+      .upload-zone .uz-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+      .upload-zone .uz-sublabel {
+        font-size: 11px;
+        color: var(--text-faint);
+        margin-top: 4px;
+        letter-spacing: 0.03em;
+      }
+      #preview-img {
+        position: absolute; inset: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        display: none;
+        z-index: 5;
+      }
+      #cover-delete-btn {
+        position: absolute;
+        top: 8px; right: 8px;
+        z-index: 10;
+        background: rgba(0,0,0,0.75);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.2);
+        cursor: pointer;
+        width: 30px; height: 30px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        transition: var(--tr);
+      }
+      #cover-delete-btn:hover { background: var(--red); border-color: var(--red); }
+      .upload-zone-wrap { position: relative; }
+      #cover-info {
+        display: none;
+        margin-top: 8px;
+        padding: 8px 12px;
+        background: var(--ok-bg);
+        border: 1px solid rgba(34,197,94,0.25);
+        font-size: 11px;
+        color: var(--ok);
+        align-items: center;
+        gap: 8px;
+      }
+      #cover-info.visible { display: flex; }
+      #cover-info svg { width: 14px; height: 14px; stroke: currentColor; fill: none; flex-shrink: 0; }
+
+      /* ================================================
+         CATEGORY
+      ================================================ */
+      .category-trigger {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border-bright);
+        background: var(--surface2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        color: var(--text);
+        cursor: pointer;
+        font-family: var(--font-ui);
+        font-weight: 500;
+        transition: border-color var(--tr), background var(--tr);
+      }
+      .category-trigger:hover, .category-trigger.open {
+        border-color: var(--yellow);
+        background: var(--yellow-glow);
+      }
+      .category-list {
+        border: 1px solid var(--border-bright);
+        border-top: none;
+        background: var(--surface3);
+        display: none;
+        max-height: 260px;
+        overflow-y: auto;
+      }
+      .category-list.show { display: block; }
+      .radio-option {
+        display: flex;
+        align-items: center;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border-light);
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--text-muted);
+        font-weight: 500;
+        transition: background var(--tr), color var(--tr);
+      }
+      .radio-option:hover { background: var(--surface4); color: var(--text); }
+      .radio-option input[type="radio"] {
+        appearance: none;
+        width: 16px; height: 16px;
+        border: 1.5px solid var(--border-bright);
+        border-radius: 50%;
+        margin-right: 10px;
+        flex-shrink: 0;
+        position: relative;
+        cursor: pointer;
+        transition: border-color var(--tr), background var(--tr);
+      }
+      .radio-option input[type="radio"]:checked {
+        border-color: var(--yellow);
+        background: var(--yellow);
+      }
+      .radio-option input[type="radio"]:checked::after {
+        content: "";
+        width: 6px; height: 6px;
+        background: var(--bg);
+        border-radius: 50%;
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      /* ================================================
+         TEXT INPUTS
+      ================================================ */
+      input[type="text"],
+      input[type="url"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border-bright);
+        background: var(--surface2);
+        color: var(--text);
+        font-size: 14px;
+        font-family: var(--font-ui);
+        font-weight: 400;
+        outline: none;
+        transition: border-color var(--tr), background var(--tr);
+      }
+      input[type="text"]:focus,
+      input[type="url"]:focus,
+      input[type="password"]:focus {
+        border-color: var(--yellow);
+        background: var(--yellow-glow);
+      }
+      input[type="text"]::placeholder,
+      input[type="url"]::placeholder { color: var(--text-faint); }
+      .char-counter {
+        text-align: right;
+        font-size: 11px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        color: var(--text-faint);
+        margin-top: 6px;
+        letter-spacing: 0.04em;
+      }
+      .char-counter.warn { color: var(--warn); }
+      .char-counter.over { color: var(--red); }
+
+      textarea#excerpt {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border-bright);
+        background: var(--surface2);
+        color: var(--text);
+        font-size: 14px;
+        font-family: var(--font-ui);
+        resize: vertical;
+        min-height: 80px;
+        outline: none;
+        line-height: 1.6;
+        transition: border-color var(--tr), background var(--tr);
+      }
+      textarea#excerpt:focus {
+        border-color: var(--yellow);
+        background: var(--yellow-glow);
+      }
+      textarea#excerpt::placeholder { color: var(--text-faint); }
+
+      /* ================================================
+         TAGS
+      ================================================ */
+      .tags-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        padding: 8px 10px;
+        border: 1px solid var(--border-bright);
+        background: var(--surface2);
+        min-height: 46px;
+        cursor: text;
+        transition: border-color var(--tr);
+      }
+      .tags-wrap:focus-within { border-color: var(--yellow); }
+      .tag-chip {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 10px;
+        background: var(--yellow-glow);
+        border: 1px solid rgba(253,185,19,0.35);
+        font-size: 12px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        color: var(--yellow);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .tag-chip-del {
+        background: none; border: none;
+        cursor: pointer;
+        color: rgba(253,185,19,0.5);
+        font-size: 14px;
+        line-height: 1;
+        padding: 0 2px;
+        transition: color var(--tr);
+      }
+      .tag-chip-del:hover { color: var(--red); }
+      #tag-input {
+        border: none; outline: none;
+        font-size: 13px;
+        font-family: var(--font-ui);
+        color: var(--text);
+        background: transparent;
+        flex: 1; min-width: 80px;
+        padding: 2px 4px;
+      }
+      #tag-input::placeholder { color: var(--text-faint); }
+
+      /* ================================================
+         RICH TEXT EDITOR
+      ================================================ */
+      .editor-wrapper {
+        border: 1px solid var(--border-bright);
+        background: var(--surface2);
+        transition: border-color var(--tr);
+      }
+      .editor-wrapper:focus-within { border-color: var(--yellow); }
+
+      /* TOOLBAR */
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1px;
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface3);
+        position: sticky;
+        top: 52px;
+        z-index: 20;
+      }
+      .tb-sep {
+        width: 1px;
+        background: var(--border);
+        margin: 0 4px;
+        align-self: stretch;
+      }
+      .tb-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px; height: 30px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 700;
+        font-family: var(--font-ui);
+        transition: background var(--tr), color var(--tr), border-color var(--tr);
+        flex-shrink: 0;
+        -webkit-touch-callout: none;
+        touch-action: manipulation;
+      }
+      .tb-btn:hover {
+        background: var(--surface4);
+        border-color: var(--border-bright);
+        color: var(--text);
+      }
+      .tb-btn.active {
+        background: var(--yellow-glow2);
+        border-color: rgba(253,185,19,0.4);
+        color: var(--yellow);
+      }
+      .tb-btn svg {
+        width: 13px; height: 13px;
+        stroke: currentColor; fill: none;
+        stroke-width: 2;
+        pointer-events: none;
+      }
+      .tb-select {
+        background: var(--surface2);
+        color: var(--text);
+        border: 1px solid var(--border-bright);
+        padding: 3px 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: var(--font-display);
+        height: 30px;
+        outline: none;
+        transition: border-color var(--tr);
+      }
+      .tb-select:focus { border-color: var(--yellow); }
+      .tb-select option { background: var(--surface3); color: var(--text); }
+      .tb-group { display: flex; align-items: center; gap: 1px; }
+      .color-picker-wrap {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 8px;
+        height: 30px;
+        background: var(--surface2);
+        border: 1px solid var(--border-bright);
+        cursor: pointer;
+        transition: border-color var(--tr);
+      }
+      .color-picker-wrap:hover { border-color: var(--yellow); }
+      .color-picker-wrap span {
+        font-size: 11px;
+        font-weight: 700;
+        font-family: var(--font-display);
+        color: var(--text-muted);
+      }
+      .color-swatch { width: 14px; height: 14px; border: 1px solid var(--border); }
+      .color-picker-wrap input[type="color"] {
+        width: 0; height: 0; opacity: 0;
+        position: absolute; pointer-events: none;
+      }
+
+      /* EDITOR BODY */
+      .editor-body {
+        min-height: 320px;
+        max-height: 700px;
+        overflow-y: auto;
+        padding: 18px 20px;
+        outline: none;
+        font-size: 15px;
+        line-height: 1.9;
+        color: var(--text);
+        font-family: var(--font-ui);
+        background: var(--surface2);
+      }
+      .editor-body:empty::before {
+        content: attr(data-placeholder);
+        color: var(--text-faint);
+        font-style: italic;
+        pointer-events: none;
+        font-size: 14px;
+      }
+      .editor-body h1 {
+        font-family: var(--font-display);
+        font-size: 22px; font-weight: 700;
+        margin: 14px 0 6px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 4px;
+        color: var(--text);
+      }
+      .editor-body h2 {
+        font-family: var(--font-display);
+        font-size: 18px; font-weight: 700;
+        margin: 12px 0 4px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 3px;
+        color: var(--text);
+      }
+      .editor-body h3 {
+        font-family: var(--font-display);
+        font-size: 15px; font-weight: 700;
+        margin: 10px 0 4px;
+        color: var(--text);
+      }
+      .editor-body p { margin: 6px 0; }
+      .editor-body a { color: var(--link); text-decoration: underline; }
+      .editor-body blockquote {
+        border-left: 3px solid var(--yellow);
+        padding: 6px 16px;
+        color: var(--text-muted);
+        margin: 12px 0;
+        background: var(--yellow-glow);
+        font-style: italic;
+      }
+      .editor-body ul, .editor-body ol { padding-left: 24px; margin: 6px 0; }
+      .editor-body li { margin: 3px 0; }
+      .editor-body hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 16px 0;
+      }
+      .editor-body figure { margin: 14px 0; }
+      .editor-body figcaption {
+        font-size: 12px;
+        color: var(--text-faint);
+        text-align: center;
+        margin-top: 6px;
+        font-style: italic;
+      }
+      .editor-body img {
+        max-width: 100%; cursor: pointer;
+        display: block; margin: 12px auto;
+        transition: outline 0.1s;
+      }
+      .editor-body img.img-left {
+        float: left; max-width: 44%;
+        margin: 4px 16px 4px 0;
+      }
+      .editor-body img.img-right {
+        float: right; max-width: 44%;
+        margin: 4px 0 4px 16px;
+      }
+      .editor-body img.img-center {
+        display: block; margin: 12px auto; max-width: 100%;
+      }
+      .editor-body img.selected {
+        outline: 2px solid var(--yellow);
+        outline-offset: 2px;
+      }
+
+      /* Floating image toolbar */
+      #img-toolbar {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        background: var(--surface3);
+        border: 1px solid var(--border-bright);
+        gap: 2px;
+        padding: 4px 6px;
+        align-items: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      }
+      #img-toolbar.visible { display: flex; }
+      #img-toolbar button {
+        padding: 4px 10px;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-family: var(--font-display);
+        transition: var(--tr);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      #img-toolbar button:hover { background: var(--surface4); color: var(--text); }
+      #img-toolbar button.del-btn { background: var(--red-bg); color: var(--red); border-color: var(--red-light); }
+      #img-toolbar button.del-btn:hover { background: var(--red); color: #fff; }
+
+      /* Editor footer */
+      .editor-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 7px 14px;
+        border-top: 1px solid var(--border-light);
+        background: var(--surface3);
+        font-size: 11px;
+        color: var(--text-faint);
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .editor-footer-left { display: flex; gap: 14px; }
+      .editor-clear-btn {
+        background: none; border: none;
+        cursor: pointer;
+        font-size: 11px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: var(--text-faint);
+        text-decoration: underline;
+        text-transform: uppercase;
+        transition: color var(--tr);
+      }
+      .editor-clear-btn:hover { color: var(--red); }
+
+      /* ================================================
+         MODALS
+      ================================================ */
+      .modal-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        z-index: 99999;
+        background: rgba(4,10,22,0.8);
+        backdrop-filter: blur(4px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.show { display: flex; }
+      .modal-box {
+        background: var(--surface);
+        border: 1px solid var(--border-bright);
+        border-top: 3px solid var(--yellow);
+        padding: 26px;
+        width: 100%;
+        max-width: 380px;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+      }
+      .modal-box h4 {
+        font-family: var(--font-display);
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text);
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border-bright);
+        background: var(--surface2);
+        color: var(--text);
+        font-size: 13px;
+        margin-bottom: 12px;
+        font-family: var(--font-ui);
+        outline: none;
+        transition: border-color var(--tr);
+      }
+      .modal-input:focus { border-color: var(--yellow); }
+      .modal-hint {
+        font-size: 11px;
+        color: var(--text-faint);
+        margin: -6px 0 14px;
+        line-height: 1.5;
+      }
+      .modal-btns { display: flex; gap: 8px; margin-top: 6px; }
+      .modal-ok {
+        flex: 1; padding: 10px;
+        border: none;
+        background: var(--yellow);
+        color: var(--bg);
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 13px;
+        font-family: var(--font-display);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        transition: background var(--tr);
+      }
+      .modal-ok:hover { background: var(--yellow-hover); }
+      .modal-ok:disabled { opacity: 0.4; cursor: not-allowed; }
+      .modal-cancel {
+        flex: 1; padding: 10px;
+        border: 1px solid var(--border-bright);
+        background: var(--surface2);
+        color: var(--text-muted);
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 13px;
+        font-family: var(--font-display);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        transition: background var(--tr), color var(--tr);
+      }
+      .modal-cancel:hover { background: var(--surface3); color: var(--text); }
+      .img-pos-row { display: flex; gap: 6px; margin-bottom: 16px; }
+      .img-pos-btn {
+        flex: 1;
+        padding: 9px 4px;
+        border: 1px solid var(--border-bright);
+        background: var(--surface2);
+        font-size: 12px;
+        font-weight: 700;
+        font-family: var(--font-display);
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        color: var(--text-muted);
+        text-align: center;
+        text-transform: uppercase;
+        transition: var(--tr);
+      }
+      .img-pos-btn.sel {
+        border-color: var(--yellow);
+        background: var(--yellow-glow);
+        color: var(--yellow);
+      }
+
+      /* ================================================
+         RIGHT INFO PANEL
+      ================================================ */
+      #info-panel { display: none; }
+      @media (min-width: 1100px) {
+        #info-panel {
+          display: block;
+          position: sticky;
+          top: 52px;
+          height: fit-content;
+          padding: 20px 16px;
+          border-left: 1px solid var(--border);
+          font-size: 13px;
+          min-height: calc(100svh - 52px);
+          background: var(--surface);
+        }
+      }
+      .info-title {
+        font-family: var(--font-display);
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        margin-bottom: 10px;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 8px;
+      }
+      .info-block { margin-bottom: 18px; }
+      .info-block p {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+        line-height: 1.5;
+      }
+      .info-block p::before {
+        content: "▸ ";
+        color: var(--yellow);
+        font-size: 10px;
+      }
+      .info-block code {
+        display: block;
+        padding: 7px 10px;
+        background: var(--surface2);
+        border: 1px solid var(--border-light);
+        font-size: 11px;
+        color: var(--text);
+        font-family: monospace;
+        word-break: break-all;
+        margin-top: 4px;
+      }
+      .info-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border-light);
+        font-size: 12px;
+      }
+      .info-stat:last-child { border-bottom: none; }
+      .info-stat-label { color: var(--text-muted); }
+      .info-stat-val { font-weight: 700; color: var(--yellow); font-family: var(--font-display); }
+
+      /* ================================================
+         VERIFY & PUBLISH
+      ================================================ */
+      .publish-section {
+        padding: 22px 20px;
+        background: var(--surface2);
+        border-top: 1px solid var(--border);
+      }
+      .verify-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding: 12px 16px;
+        background: var(--surface3);
+        border: 1px solid var(--border-bright);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: border-color var(--tr), background var(--tr);
+      }
+      .verify-box:hover { border-color: var(--yellow); }
+      input[type="checkbox"] {
+        appearance: none;
+        width: 18px; height: 18px;
+        border: 1.5px solid var(--border-bright);
+        flex-shrink: 0;
+        position: relative;
+        cursor: pointer;
+        background: var(--surface2);
+        transition: var(--tr);
+      }
+      input[type="checkbox"]:checked {
+        background: var(--yellow);
+        border-color: var(--yellow);
+      }
+      input[type="checkbox"]:checked::after {
+        content: "✓";
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 11px;
+        color: var(--bg);
+        line-height: 1;
+        font-weight: 800;
+      }
+      .publish-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .publish-btn {
+        padding: 12px 32px;
+        border: none;
+        background: var(--yellow);
+        color: var(--bg);
+        font-size: 13px;
+        font-weight: 800;
+        font-family: var(--font-display);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background var(--tr), box-shadow var(--tr), transform 0.1s;
+        box-shadow: 0 0 0 0 var(--yellow-glow);
+      }
+      .publish-btn:hover:not(:disabled) {
+        background: var(--yellow-hover);
+        box-shadow: 0 0 24px var(--yellow-glow2);
+        transform: translateY(-1px);
+      }
+      .publish-btn:active:not(:disabled) { transform: translateY(0); }
+      .publish-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+      .draft-btn {
+        padding: 12px 20px;
+        border: 1px solid var(--border-bright);
+        background: var(--surface3);
+        color: var(--text-muted);
+        font-size: 13px;
+        font-weight: 600;
+        font-family: var(--font-display);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: var(--tr);
+      }
+      .draft-btn:hover { background: var(--surface4); color: var(--text); border-color: var(--yellow); }
+      #status-msg {
+        flex: 1;
+        font-size: 12px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0.06em;
+        padding: 8px 12px;
+        background: var(--surface3);
+        border: 1px solid var(--border-light);
+        display: none;
+      }
+
+      /* ================================================
+         NOTICES / ALERTS
+      ================================================ */
+      .notice {
+        padding: 10px 14px;
+        font-size: 13px;
+        border-left: 3px solid var(--border-bright);
+        background: var(--surface2);
+        margin-bottom: 14px;
+        color: var(--text-muted);
+      }
+      .notice.ok { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); }
+      .notice.warn { border-color: var(--warn); background: var(--warn-bg); color: var(--warn); }
+      .notice.error { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+
+      /* ================================================
+         HIDDEN INPUTS
+      ================================================ */
+      #file-input, #inline-img-input { display: none; }
+
+      /* ================================================
+         WEBP BADGE
+      ================================================ */
+      .webp-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--ok-bg);
+        color: var(--ok);
+        border: 1px solid rgba(34,197,94,0.3);
+        font-size: 10px;
+        font-weight: 700;
+        font-family: var(--font-display);
+        letter-spacing: 0.1em;
+        padding: 2px 8px;
+        text-transform: uppercase;
+        margin-left: 6px;
+        vertical-align: middle;
+      }
+      .converting-pulse { animation: convertPulse 1s ease-in-out infinite; }
+      @keyframes convertPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+      /* ================================================
+         SCROLLBAR
+      ================================================ */
+      ::-webkit-scrollbar { width: 5px; height: 5px; }
+      ::-webkit-scrollbar-track { background: var(--surface); }
+      ::-webkit-scrollbar-thumb { background: var(--border-bright); }
+      ::-webkit-scrollbar-thumb:hover { background: var(--yellow); }
+
+      /* ================================================
+         KEYBOARD SHORTCUT BADGE
+      ================================================ */
+      kbd {
+        display: inline-block;
+        padding: 1px 6px;
+        font-size: 10px;
+        border: 1px solid var(--border-bright);
+        background: var(--surface2);
+        font-family: var(--font-display);
+        font-weight: 700;
+        color: var(--yellow);
+        letter-spacing: 0.06em;
+      }
+
+      /* ================================================
+         TOAST NOTIFICATION SYSTEM
+      ================================================ */
+      #toast-stack {
+        position: fixed;
+        bottom: 24px; right: 24px;
+        z-index: 9999998;
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 8px;
+        pointer-events: none;
+      }
+      .toast {
+        padding: 12px 18px;
+        font-size: 13px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        max-width: 340px; min-width: 240px;
+        border-left: 3px solid var(--border-bright);
+        background: var(--surface3);
+        color: var(--text);
+        line-height: 1.4;
+        opacity: 0;
+        transform: translateX(16px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        pointer-events: all;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      }
+      .toast.show { opacity: 1; transform: translateX(0); }
+      .toast.toast-ok { border-left-color: var(--ok); background: #0b2218; }
+      .toast.toast-error { border-left-color: var(--red); background: #200808; }
+      .toast.toast-warn { border-left-color: var(--warn); background: #1e160a; }
+      .toast.toast-info { border-left-color: var(--link); background: var(--surface3); }
+
+      /* ================================================
+         IMAGE CROPPER MODAL
+      ================================================ */
+      .cropper-modal-box { max-width: 680px !important; width: 100% !important; }
+      .cropper-stage {
+        position: relative; width: 100%;
+        background: #060d1a;
+        overflow: hidden; margin-bottom: 14px;
+        border: 2px solid var(--yellow);
+        cursor: crosshair; touch-action: none;
+      }
+      #cropperCanvas { display: block; width: 100%; height: auto; }
+      .cropper-frame-label {
+        position: absolute; bottom: 8px; right: 10px;
+        font-size: 10px; font-weight: 700;
+        font-family: var(--font-display);
+        letter-spacing: 0.1em;
+        color: rgba(255,255,255,0.7);
+        background: rgba(0,0,0,0.5);
+        padding: 2px 8px;
+        text-transform: uppercase;
+      }
+      .cropper-hint-label {
+        position: absolute; top: 10px; left: 10px;
+        font-size: 11px; font-family: var(--font-ui);
+        color: rgba(255,255,255,0.75);
+        background: rgba(0,0,0,0.5);
+        padding: 3px 8px;
+        pointer-events: none;
+      }
+      .cropper-zoom-row {
+        display: flex; align-items: center;
+        gap: 12px; margin-bottom: 14px;
+      }
+      .cropper-zoom-row input[type="range"] {
+        flex: 1; accent-color: var(--yellow);
+        height: 4px; cursor: pointer;
+      }
+      .cropper-zoom-row label {
+        font-family: var(--font-display);
+        font-size: 10px; font-weight: 700;
+        color: var(--text-muted); margin: 0;
+        letter-spacing: 0.12em; white-space: nowrap;
+        text-transform: uppercase;
+      }
+      #cropZoomVal {
+        font-size: 12px; font-weight: 700;
+        font-family: var(--font-display);
+        color: var(--yellow); min-width: 32px;
+        text-align: right;
+      }
+      .cropper-skip-notice {
+        padding: 10px 14px;
+        background: var(--ok-bg);
+        border: 1px solid rgba(34,197,94,0.25);
+        font-size: 12px; font-family: var(--font-display);
+        font-weight: 600; color: var(--ok);
+        margin-bottom: 12px; display: none;
+        letter-spacing: 0.04em;
+      }
+      .cropper-skip-notice.show { display: block; }
+
+      /* ================================================
+         SUCCESS SCREEN
+      ================================================ */
+      #success-screen {
+        display: none;
+        position: fixed; inset: 0;
+        z-index: 9999990;
+        background: rgba(4,10,22,0.92);
+        backdrop-filter: blur(6px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      #success-screen.show { display: flex; }
+      .success-card {
+        background: var(--surface);
+        border: 1px solid var(--border-bright);
+        border-top: 4px solid var(--yellow);
+        padding: 40px 36px;
+        max-width: 460px; width: 100%;
+        text-align: center;
+        box-shadow: 0 0 60px rgba(253,185,19,0.12);
+      }
+      .success-icon {
+        width: 68px; height: 68px;
+        background: var(--yellow);
+        display: flex; align-items: center;
+        justify-content: center;
+        margin: 0 auto 22px;
+        font-size: 30px; color: var(--bg);
+        box-shadow: 0 0 30px var(--yellow-glow2);
+      }
+      .success-card h2 {
+        font-family: var(--font-display);
+        font-size: 24px; font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+      .success-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; line-height: 1.5; }
+      .success-headline-text {
+        font-family: var(--font-display);
+        font-size: 15px; color: var(--text);
+        font-weight: 700; margin: 14px 0 10px;
+        padding: 12px 14px;
+        background: var(--surface2);
+        border-left: 3px solid var(--yellow);
+        text-align: left; line-height: 1.4;
+      }
+      .success-meta {
+        font-size: 11px; color: var(--text-faint);
+        margin-bottom: 26px;
+        display: flex; justify-content: center;
+        gap: 14px; flex-wrap: wrap;
+        font-family: var(--font-display);
+        font-weight: 600; letter-spacing: 0.06em;
+      }
+      .success-meta span { display: flex; align-items: center; gap: 4px; }
+      .success-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+      .success-actions button {
+        flex: 1; padding: 12px 16px;
+        font-size: 12px; font-weight: 800;
+        font-family: var(--font-display);
+        letter-spacing: 0.1em; text-transform: uppercase;
+        cursor: pointer; transition: var(--tr);
+        border: none;
+      }
+      .success-actions .btn-primary {
+        background: var(--yellow); color: var(--bg);
+      }
+      .success-actions .btn-primary:hover { background: var(--yellow-hover); }
+      .success-actions .btn-secondary {
+        background: var(--surface2); color: var(--text-muted);
+        border: 1px solid var(--border);
+      }
+      .success-actions .btn-secondary:hover { background: var(--surface3); color: var(--text); }
+
+      /* ================================================
+         SEO PREVIEW CARD
+      ================================================ */
+      .seo-preview-block { margin-top: 0; }
+      .seo-card {
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        padding: 12px 14px;
+        font-family: var(--font-ui);
+      }
+      .seo-card-domain {
+        font-size: 11px; color: var(--text-muted);
+        margin-bottom: 3px;
+        display: flex; align-items: center; gap: 6px;
+      }
+      .seo-card-domain-icon {
+        width: 16px; height: 16px;
+        background: var(--yellow);
+        display: inline-flex; align-items: center;
+        justify-content: center;
+        font-size: 8px; color: var(--bg);
+        font-weight: 700; flex-shrink: 0;
+        font-family: var(--font-display);
+      }
+      .seo-card-title {
+        font-size: 16px; color: #7ab8ff;
+        font-weight: 400; line-height: 1.3;
+        margin-bottom: 4px;
+        white-space: nowrap; overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .seo-card-title.over-limit { color: var(--red); }
+      .seo-card-desc {
+        font-size: 12px; color: var(--text-muted);
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .seo-card-desc.empty { color: var(--text-faint); font-style: italic; }
+      .seo-char-hints {
+        display: flex; justify-content: space-between;
+        font-size: 10px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        color: var(--text-faint);
+        margin-top: 8px;
+        letter-spacing: 0.06em;
+      }
+      .seo-char-hints span.warn { color: var(--warn); }
+      .seo-char-hints span.ok { color: var(--ok); }
+      .seo-char-hints span.over { color: var(--red); }
+
+      /* ================================================
+         MOBILE RESPONSIVE
+      ================================================ */
+      @media (max-width: 799px) {
+        .form-section { padding: 16px 14px; }
+        .page-header { padding: 14px 14px 0; }
+        .editor-body { max-height: 480px; font-size: 14px; }
+        .toolbar {
+          position: fixed;
+          bottom: 0; left: 0; right: 0; top: auto;
+          z-index: 200;
+          border-top: 2px solid var(--border-bright);
+          border-bottom: none;
+          background: var(--surface3);
+          padding: 6px 8px;
+          padding-bottom: env(safe-area-inset-bottom, 6px);
+          box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+          overflow-x: auto;
+          flex-wrap: nowrap;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .toolbar::-webkit-scrollbar { display: none; }
+        .editor-wrapper { padding-bottom: 56px; }
+        .publish-section { margin-bottom: 80px; }
+        .tb-btn { width: 38px; height: 38px; }
+        .tb-btn svg { width: 18px; height: 18px; }
+        .tb-select { height: 34px; font-size: 13px; }
+        #toast-stack { bottom: auto; top: 60px; right: 12px; left: 12px; }
+        .toast { max-width: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Toast Stack -->
+    <div id="toast-stack"></div>
+
+    <!-- Success Screen -->
+    <div id="success-screen">
+      <div class="success-card">
+        <div class="success-icon">✓</div>
+        <h2>Habari Imechapishwa!</h2>
+        <p>Habari yako imepelekwa kwenye mfumo kwa mafanikio.</p>
+        <div class="success-headline-text" id="success-headline-display"></div>
+        <div class="success-meta" id="success-meta-row"></div>
+        <div class="success-actions">
+          <button class="btn-primary" onclick="writeNewArticle()">✏ Andika Habari Nyingine</button>
+          <button class="btn-secondary" onclick="location.reload()">↺ Reload Panel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         MODALS
+    ==================================================== -->
+
+    <!-- Link Modal -->
+    <div class="modal-overlay" id="linkModal">
+      <div class="modal-box">
+        <h4>Weka Kiungo (Link)</h4>
+        <label>Maandishi ya link <span style="font-weight:400;color:var(--text-faint);text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input class="modal-input" id="linkText" type="text" placeholder="Maandishi yaliyochaguliwa yatatumika" />
+        <label>URL</label>
+        <input class="modal-input" id="linkUrl" type="url" placeholder="https://mnyilinga.co.tz" />
+        <p class="modal-hint">💡 Chagua maandishi kwanza, kisha bonyeza kitufe cha link.</p>
+        <div class="modal-btns">
+          <button class="modal-cancel" onclick="closeModal('linkModal')">Kanseli</button>
+          <button class="modal-ok" onclick="insertLink()">Weka Link</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inline Image Modal -->
+    <div class="modal-overlay" id="imgModal">
+      <div class="modal-box">
+        <h4>Weka Picha ndani ya Makala</h4>
+        <label>Nafasi ya Picha</label>
+        <div class="img-pos-row">
+          <div class="img-pos-btn sel" id="pos-center" onclick="setImgPos('center')">⬛ Katikati</div>
+          <div class="img-pos-btn" id="pos-left" onclick="setImgPos('left')">◧ Kushoto</div>
+          <div class="img-pos-btn" id="pos-right" onclick="setImgPos('right')">◨ Kulia</div>
+        </div>
+        <label>Maelezo ya Picha <span style="font-weight:400;color:var(--text-faint);text-transform:none;letter-spacing:0">(caption, optional)</span></label>
+        <input class="modal-input" id="imgCaption" type="text" placeholder="Maelezo mafupi ya picha..." />
+        <p class="modal-hint">💡 Picha itaingizwa mahali cursor ilipo ndani ya makala.</p>
+        <div class="modal-btns">
+          <button class="modal-cancel" onclick="closeModal('imgModal')">Kanseli</button>
+          <button class="modal-ok" onclick="triggerInlineImg()">Chagua Picha →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clear editor confirm -->
+    <div class="modal-overlay" id="clearModal">
+      <div class="modal-box">
+        <h4>Futa Yaliyomo Yote</h4>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:18px;line-height:1.6">
+          Una uhakika unataka kufuta makala yote? Hatua hii haiwezi kurejeshwa.
+        </p>
+        <div class="modal-btns">
+          <button class="modal-cancel" onclick="closeModal('clearModal')">Hapana</button>
+          <button class="modal-ok" onclick="clearEditor()">Ndiyo, Futa</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Cropper Modal -->
+    <div class="modal-overlay" id="cropperModal">
+      <div class="modal-box cropper-modal-box">
+        <h4>✂ Kata Picha — 1200 × 800 px</h4>
+        <div class="cropper-skip-notice" id="cropper-skip-notice">
+          ✦ Picha ina ukubwa sahihi (1200×800) — inapakia moja kwa moja...
+        </div>
+        <p class="modal-hint" style="margin-bottom:10px">
+          Buruta picha kuweka sehemu unayotaka. Frame inabaki 1200×800 (3:2) daima.
+        </p>
+        <div class="cropper-stage" id="cropperStage">
+          <canvas id="cropperCanvas" width="600" height="400"></canvas>
+          <div class="cropper-hint-label">✋ Buruta picha</div>
+          <div class="cropper-frame-label">1200 × 800 px · 3:2</div>
+        </div>
+        <div class="cropper-zoom-row">
+          <label>Zoom</label>
+          <input type="range" id="cropZoom" min="1" max="4" step="0.02" value="1" />
+          <span id="cropZoomVal">1.0×</span>
+        </div>
+        <div class="modal-btns">
+          <button class="modal-cancel" onclick="cancelCrop()">Kanseli</button>
+          <button class="modal-ok" id="applyCropBtn" onclick="applyCrop()">Tumia Picha →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Image Toolbar -->
+    <div id="img-toolbar">
+      <button onclick="alignSelectedImg('left')">◧ Kushoto</button>
+      <button onclick="alignSelectedImg('center')">⬛ Katikati</button>
+      <button onclick="alignSelectedImg('right')">◨ Kulia</button>
+      <button onclick="deleteSelectedImg()" class="del-btn">✕ Futa</button>
+    </div>
+
+    <!-- ====================================================
+         TOP BAR
+    ==================================================== -->
+    <div id="topbar">
+      <img src="https://news.mnyilinga.co.tz/assets/main.logo.svg"
+           alt="Mnyilinga" class="topbar-logo"
+           onerror="this.style.display='none';document.querySelector('.topbar-logo-fallback').style.display='block'" />
+      <span class="topbar-logo-fallback" style="display:none;font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--yellow);letter-spacing:-0.02em">Mnyilinga</span>
+      <div class="topbar-sep"></div>
+      <div class="topbar-badge">Admin Panel</div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <div id="topbar-save-status">✓ Imehifadhiwa</div>
+        <span class="topbar-time" id="topbar-clock"></span>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         PAGE BODY
+    ==================================================== -->
+    <div id="page-body">
+      <!-- SIDEBAR -->
+      <nav id="wiki-sidebar">
+        <div class="sb-section">
+          <div class="sb-title">Sehemu za Fomu</div>
+          <a class="sb-link" onclick="scrollTo('sec-cover')">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Picha Kuu
+          </a>
+          <a class="sb-link" onclick="scrollTo('sec-cat')">
+            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+            Category
+          </a>
+          <a class="sb-link" onclick="scrollTo('sec-headline')">
+            <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="10" x2="14" y2="10"/></svg>
+            Headline
+          </a>
+          <a class="sb-link" onclick="scrollTo('sec-excerpt')">
+            <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="17" y2="12"/></svg>
+            Muhtasari
+          </a>
+          <a class="sb-link" onclick="scrollTo('sec-tags')">
+            <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Tags
+          </a>
+          <a class="sb-link" onclick="scrollTo('sec-article')">
+            <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="15" y2="18"/></svg>
+            Makala
+          </a>
+        </div>
+        <div class="sb-divider"></div>
+        <div class="sb-section">
+          <div class="sb-title">Zana</div>
+          <a class="sb-link" onclick="document.getElementById('editor').focus()">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+            Andika / Edit
+          </a>
+          <a class="sb-link" onclick="previewArticle()">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview Makala
+          </a>
+          <a class="sb-link" onclick="openModal('clearModal')">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            Futa Editor
+          </a>
+          <a class="sb-link" onclick="copyHTMLToClipboard()">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Nakili HTML
+          </a>
+        </div>
+        <div class="sb-divider"></div>
+        <div class="sb-status-card">
+          <b>Hali ya Fomu</b>
+          <div class="sb-status-row"><span>Maneno:</span><span class="sb-status-val" id="sb-words">0</span></div>
+          <div class="sb-status-row"><span>Picha:</span><span class="sb-status-val" id="sb-imgs">0</span></div>
+          <div class="sb-status-row"><span>Tags:</span><span class="sb-status-val" id="sb-tags-count">0</span></div>
+        </div>
+      </nav>
+
+      <!-- MAIN CONTENT -->
+      <div id="main-content">
+        <div class="page-header">
+          <div class="page-tabs">
+            <div class="page-tab active">Andika</div>
+            <div class="page-tab" onclick="previewArticle()">Hakiki</div>
+          </div>
+        </div>
+
+        <!-- COVER IMAGE -->
+        <div class="form-section" id="sec-cover">
+          <h2 class="section-heading">
+            <span class="accent-dot"></span>
+            Picha Kuu
+            <a class="anchor" href="#sec-cover" title="Link hapa">#</a>
+          </h2>
+          <label>Pakia picha kuu ya habari (Cover Image)</label>
+          <div class="upload-zone-wrap">
+            <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+              <svg fill="none" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span class="uz-label">Bonyeza hapa au buruta picha</span>
+              <span class="uz-sublabel">JPG · PNG · WEBP — hadi 10MB · Inabadilishwa WebP otomatiki ✦</span>
+              <img id="preview-img" src="#" alt="Preview" />
+            </div>
+            <button id="cover-delete-btn" title="Futa picha kuu" onclick="deleteCoverImage()">✕</button>
+          </div>
+          <div id="cover-info" class="notice ok" style="display:none">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="cover-info-text">Picha imepakiwa</span>
+          </div>
+          <input type="file" id="file-input" accept="image/*" />
+        </div>
+
+        <!-- CATEGORY -->
+        <div class="form-section" id="sec-cat">
+          <h2 class="section-heading">
+            <span class="accent-dot"></span>Category
+          </h2>
+          <label>Chagua aina ya habari</label>
+          <div class="category-trigger" id="catTrigger">
+            <span id="catSelected">Chagua category...</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div class="category-list" id="catList">
+            <label class="radio-option"><input type="radio" name="category" value="Technology"/><span>Technology</span></label>
+            <label class="radio-option"><input type="radio" name="category" value="Mapenzi"/><span>Mapenzi</span></label>
+            <label class="radio-option"><input type="radio" name="category" value="Afya"/><span>Afya</span></label>
+            <label class="radio-option"><input type="radio" name="category" value="Uchumi"/><span>Uchumi</span></label>
+            <label class="radio-option"><input type="radio" name="category" value="Burudani"/><span>Burudani</span></label>
+            <label class="radio-option"><input type="radio" name="category" value="Michezo"/><span>Michezo</span></label>
+            <label class="radio-option"><input type="radio" name="category" value="Siasa"/><span>Siasa</span></label>
+            <label class="radio-option"><input type="radio" name="category" value="Elimu"/><span>Elimu</span></label>
+            <label class="radio-option"><input type="radio" name="category" value="Matukio"/><span>Matukio</span></label>
+            <label class="radio-option"><input type="radio" name="category" value="Lifestyle"/><span>Lifestyle</span></label>
+          </div>
+        </div>
+
+        <!-- HEADLINE -->
+        <div class="form-section" id="sec-headline">
+          <h2 class="section-heading">
+            <span class="accent-dot"></span>Headline
+          </h2>
+          <label>Kichwa cha Habari <kbd>max 120</kbd></label>
+          <input type="text" id="headline" placeholder="Andika kichwa cha habari hapa..." maxlength="120"
+            oninput="updateCharCount();updateSeoPreview();autoSave();" />
+          <div class="char-counter" id="charCounter">0 / 120</div>
+        </div>
+
+        <!-- EXCERPT -->
+        <div class="form-section" id="sec-excerpt">
+          <h2 class="section-heading">
+            <span class="accent-dot"></span>Muhtasari
+            <span style="font-family:var(--font-ui);font-size:12px;font-weight:400;color:var(--text-faint);text-transform:none;letter-spacing:0">— Optional</span>
+          </h2>
+          <label>Maelezo mafupi ya habari (SEO description, hadi 200 herufi)</label>
+          <textarea id="excerpt" placeholder="Andika muhtasari mfupi wa habari hii..." maxlength="200"
+            oninput="updateExcerptCount();updateSeoPreview();autoSave();"></textarea>
+          <div class="char-counter" id="excerptCounter">0 / 200</div>
+        </div>
+
+        <!-- TAGS -->
+        <div class="form-section" id="sec-tags">
+          <h2 class="section-heading">
+            <span class="accent-dot"></span>Tags / Maneno Muhimu
+          </h2>
+          <label>Bonyeza Enter kuongeza tag</label>
+          <div class="tags-wrap" id="tags-wrap" onclick="document.getElementById('tag-input').focus()">
+            <input type="text" id="tag-input" placeholder="Andika tag, bonyeza Enter..." />
+          </div>
+          <p style="font-size:11px;font-family:var(--font-display);font-weight:600;letter-spacing:0.06em;color:var(--text-faint);margin-top:8px;text-transform:uppercase">
+            Mfano: siasa · uchaguzi · Dar es Salaam
+          </p>
+        </div>
+
+        <!-- RICH TEXT EDITOR -->
+        <div class="form-section" id="sec-article">
+          <h2 class="section-heading">
+            <span class="accent-dot"></span>Makala
+          </h2>
+          <div class="editor-wrapper">
+            <!-- TOOLBAR -->
+            <div class="toolbar" id="toolbar">
+              <select class="tb-select"
+                onmousedown="saveSelection()"
+                onchange="restoreSelection();formatBlock(this.value);this.value='p';"
+                title="Heading">
+                <option value="p">¶ Normal</option>
+                <option value="h1">H1</option>
+                <option value="h2">H2</option>
+                <option value="h3">H3</option>
+                <option value="h4">H4</option>
+              </select>
+              <div class="tb-sep"></div>
+              <div class="tb-group">
+                <button class="tb-btn" id="btn-bold" onmousedown="return false;" onclick="fmt('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+                <button class="tb-btn" id="btn-italic" onmousedown="return false;" onclick="fmt('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+                <button class="tb-btn" id="btn-underline" onmousedown="return false;" onclick="fmt('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+                <button class="tb-btn" id="btn-strike" onmousedown="return false;" onclick="fmt('strikeThrough')" title="Strikethrough"><s>S</s></button>
+              </div>
+              <div class="tb-sep"></div>
+              <div class="color-picker-wrap" id="fgWrap" title="Rangi ya Maandishi" onclick="document.getElementById('fgPicker').click()">
+                <span>A</span>
+                <div class="color-swatch" id="fg-swatch" style="background:#e8edf5"></div>
+                <input type="color" id="fgPicker" value="#e8edf5" />
+              </div>
+              <div class="color-picker-wrap" id="bgWrap" title="Highlight" onclick="document.getElementById('bgPicker').click()">
+                <span>Hl</span>
+                <div class="color-swatch" id="bg-swatch" style="background:#fdb913"></div>
+                <input type="color" id="bgPicker" value="#fdb913" />
+              </div>
+              <div class="tb-sep"></div>
+              <div class="tb-group">
+                <button class="tb-btn" onmousedown="return false;" onclick="fmt('justifyLeft')" title="Kushoto">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+                </button>
+                <button class="tb-btn" onmousedown="return false;" onclick="fmt('justifyCenter')" title="Katikati">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <button class="tb-btn" onmousedown="return false;" onclick="fmt('justifyRight')" title="Kulia">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>
+                </button>
+              </div>
+              <div class="tb-sep"></div>
+              <div class="tb-group">
+                <button class="tb-btn" onmousedown="return false;" onclick="fmt('insertUnorderedList')" title="Orodha">
+                  <svg viewBox="0 0 24 24">
+                    <line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/>
+                    <circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/>
+                    <circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+                    <circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/>
+                  </svg>
+                </button>
+                <button class="tb-btn" onmousedown="return false;" onclick="fmt('insertOrderedList')" title="Orodha ya Nambari">
+                  <svg viewBox="0 0 24 24">
+                    <line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/>
+                    <text x="2" y="8" font-size="7" fill="currentColor" stroke="none">1.</text>
+                    <text x="2" y="14" font-size="7" fill="currentColor" stroke="none">2.</text>
+                    <text x="2" y="20" font-size="7" fill="currentColor" stroke="none">3.</text>
+                  </svg>
+                </button>
+                <button class="tb-btn" onmousedown="return false;" onclick="fmt('outdent')" title="Punguza Indent">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="7" y1="12" x2="21" y2="12"/><polyline points="3 9 6 12 3 15"/></svg>
+                </button>
+                <button class="tb-btn" onmousedown="return false;" onclick="fmt('indent')" title="Ongeza Indent">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="11" y1="12" x2="21" y2="12"/><polyline points="7 9 10 12 7 15"/></svg>
+                </button>
+              </div>
+              <div class="tb-sep"></div>
+              <div class="tb-group">
+                <button class="tb-btn" onmousedown="return false;" onclick="fmt('formatBlock','blockquote')" title="Nukuu">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/>
+                    <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/>
+                  </svg>
+                </button>
+                <button class="tb-btn" onmousedown="return false;" onclick="insertHR()" title="Mstari" style="font-size:14px;font-weight:900">━</button>
+              </div>
+              <div class="tb-sep"></div>
+              <div class="tb-group">
+                <button class="tb-btn" onmousedown="saveSelectionEvent(event)" onclick="openLinkModal()" title="Weka Link">
+                  <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                </button>
+                <button class="tb-btn" onmousedown="return false;" onclick="fmt('unlink')" title="Futa Link">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M18.84 12.25l1.72-1.71a5.004 5.004 0 00-.12-7.07 5.006 5.006 0 00-6.95 0l-1.72 1.71"/>
+                    <path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 00.12 7.07 5.006 5.006 0 006.95 0l1.71-1.71"/>
+                    <line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/>
+                    <line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/>
+                  </svg>
+                </button>
+                <button class="tb-btn" onmousedown="saveSelectionEvent(event)" onclick="openImgModal()" title="Weka Picha ndani ya Makala">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </button>
+              </div>
+              <div class="tb-sep"></div>
+              <div class="tb-group">
+                <button class="tb-btn" onmousedown="return false;" onclick="fmt('undo')" title="Rudi Nyuma (Ctrl+Z)">
+                  <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                </button>
+                <button class="tb-btn" onmousedown="return false;" onclick="fmt('redo')" title="Rudi Mbele (Ctrl+Y)">
+                  <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                </button>
+              </div>
+              <div class="tb-sep"></div>
+              <button class="tb-btn" onmousedown="return false;" onclick="fmt('removeFormat')" title="Futa Uformatishaji">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+
+            <!-- EDITOR AREA -->
+            <div class="editor-body" id="editor" contenteditable="true"
+              data-placeholder="Andika makala yako hapa..."
+              oninput="updateWordCount();autoSave();"></div>
+
+            <!-- FOOTER -->
+            <div class="editor-footer">
+              <div class="editor-footer-left">
+                <span id="wordCount">0 maneno</span>
+                <span id="charCount2">0 herufi</span>
+                <span id="imgCount">0 picha</span>
+              </div>
+              <button class="editor-clear-btn" onclick="openModal('clearModal')">Futa yote</button>
+            </div>
+          </div>
+        </div>
+
+        <input type="file" id="inline-img-input" accept="image/*" />
+
+        <!-- PUBLISH -->
+        <div class="publish-section">
+          <label class="verify-box" for="verify">
+            <input type="checkbox" id="verify"
+              onchange="document.getElementById('submitBtn').disabled = !this.checked" />
+            <span>Nimehakiki habari ni sahihi na inafaa kuchapishwa</span>
+          </label>
+          <div class="publish-row">
+            <button class="publish-btn" id="submitBtn" disabled onclick="handlePublish()">
+              ▶ Chapisha Habari
+            </button>
+            <button class="draft-btn" onclick="saveDraft()">Hifadhi Rasimu</button>
+            <div id="status-msg"></div>
+          </div>
+        </div>
+      </div>
+      <!-- /main-content -->
+
+      <!-- RIGHT INFO PANEL -->
+      <aside id="info-panel">
+        <div class="info-block">
+          <div class="info-title">Muhtasari wa Fomu</div>
+          <div class="info-stat"><span class="info-stat-label">Maneno (makala):</span><span class="info-stat-val" id="ip-words">0</span></div>
+          <div class="info-stat"><span class="info-stat-label">Herufi (makala):</span><span class="info-stat-val" id="ip-chars">0</span></div>
+          <div class="info-stat"><span class="info-stat-label">Picha ndani:</span><span class="info-stat-val" id="ip-imgs">0</span></div>
+          <div class="info-stat"><span class="info-stat-label">Tags:</span><span class="info-stat-val" id="ip-tags">0</span></div>
+          <div class="info-stat"><span class="info-stat-label">Category:</span><span class="info-stat-val" id="ip-cat">—</span></div>
+        </div>
+        <div class="sb-divider"></div>
+        <div class="info-block">
+          <div class="info-title">Vidokezo</div>
+          <p>Headline bora ina maneno 8–12</p>
+          <p>Makala nzuri ina maneno 300+</p>
+          <p>Ongeza picha ndani ya makala</p>
+          <p>Tags husaidia kutafutwa kwa urahisi</p>
+        </div>
+        <div class="sb-divider"></div>
+        <div class="info-block seo-preview-block">
+          <div class="info-title">SEO Preview — Google</div>
+          <div class="seo-card">
+            <div class="seo-card-domain">
+              <span class="seo-card-domain-icon">M</span>
+              mnyilinga.co.tz
+            </div>
+            <div class="seo-card-title" id="seo-title">Kichwa cha habari kitaonekana hapa...</div>
+            <div class="seo-card-desc empty" id="seo-desc">Muhtasari wa habari utaonekana hapa. Andika excerpt nzuri kwa SEO bora.</div>
+          </div>
+          <div class="seo-char-hints">
+            <span id="seo-title-hint">Kichwa: 0/60</span>
+            <span id="seo-desc-hint">Desc: 0/160</span>
+          </div>
+        </div>
+        <div class="sb-divider"></div>
+        <div class="info-block">
+          <div class="info-title">Mkato wa Keyboard</div>
+          <p style="margin-bottom:5px"><kbd>Ctrl+B</kbd> <span style="color:var(--text-muted);text-transform:none;letter-spacing:0"> Bold</span></p>
+          <p style="margin-bottom:5px"><kbd>Ctrl+I</kbd> <span style="color:var(--text-muted);text-transform:none;letter-spacing:0"> Italic</span></p>
+          <p style="margin-bottom:5px"><kbd>Ctrl+U</kbd> <span style="color:var(--text-muted);text-transform:none;letter-spacing:0"> Underline</span></p>
+          <p style="margin-bottom:5px"><kbd>Ctrl+Z</kbd> <span style="color:var(--text-muted);text-transform:none;letter-spacing:0"> Rudi nyuma</span></p>
+          <p><kbd>Ctrl+Y</kbd> <span style="color:var(--text-muted);text-transform:none;letter-spacing:0"> Rudi mbele</span></p>
+        </div>
+      </aside>
+    </div>
+
+    <script>
+      // ============================================================
+      //  WEBP CONVERSION ENGINE
+      // ============================================================
+      async function convertToWebP(file, quality = 0.88) {
+        if (file.type === "image/webp") return file;
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          const objectUrl = URL.createObjectURL(file);
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            URL.revokeObjectURL(objectUrl);
+            canvas.toBlob((blob) => {
+              if (!blob) { reject(new Error("WebP conversion haikufanikiwa")); return; }
+              const baseName = file.name.replace(/\.[^/.]+$/, "");
+              const webpFile = new File([blob], baseName + ".webp", { type: "image/webp", lastModified: Date.now() });
+              resolve(webpFile);
+            }, "image/webp", quality);
+          };
+          img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Hitilafu ya kusoma picha")); };
+          img.src = objectUrl;
+        });
+      }
+
+      function showWebPBadge(originalFile, webpFile, infoTextEl) {
+        const origKB = (originalFile.size / 1024).toFixed(0);
+        const webpKB = (webpFile.size / 1024).toFixed(0);
+        const savings = Math.max(0, Math.round((1 - webpFile.size / originalFile.size) * 100));
+        infoTextEl.innerHTML = `${webpFile.name} &nbsp;<span class="webp-badge">✦ WebP</span>&nbsp; ${webpKB} KB` +
+          (savings > 0 ? ` <span style="color:var(--ok);font-weight:700;">↓${savings}% ndogo</span>` : "");
+      }
+
+      // ============================================================
+      //  TOAST NOTIFICATION SYSTEM
+      // ============================================================
+      function toast(message, type = "info", duration = 4500) {
+        const stack = document.getElementById("toast-stack");
+        const t = document.createElement("div");
+        t.className = `toast toast-${type}`;
+        t.textContent = message;
+        t.onclick = () => dismissToast(t);
+        stack.appendChild(t);
+        requestAnimationFrame(() => { requestAnimationFrame(() => { t.classList.add("show"); }); });
+        const timer = setTimeout(() => dismissToast(t), duration);
+        t._timer = timer;
+      }
+      function dismissToast(t) {
+        clearTimeout(t._timer);
+        t.classList.remove("show");
+        setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, 250);
+      }
+
+      // ============================================================
+      //  SEO PREVIEW
+      // ============================================================
+      function updateSeoPreview() {
+        const headline = document.getElementById("headline").value;
+        const excerpt = document.getElementById("excerpt").value;
+        const titleEl = document.getElementById("seo-title");
+        const descEl = document.getElementById("seo-desc");
+        const titleHint = document.getElementById("seo-title-hint");
+        const descHint = document.getElementById("seo-desc-hint");
+        if (!titleEl) return;
+        const tLen = headline.length;
+        if (headline) {
+          titleEl.textContent = headline;
+          titleEl.classList.toggle("over-limit", tLen > 60);
+        } else {
+          titleEl.textContent = "Kichwa cha habari kitaonekana hapa...";
+          titleEl.classList.remove("over-limit");
+        }
+        if (excerpt) {
+          descEl.textContent = excerpt;
+          descEl.classList.remove("empty");
+        } else {
+          descEl.textContent = "Muhtasari wa habari utaonekana hapa. Andika excerpt nzuri kwa SEO bora.";
+          descEl.classList.add("empty");
+        }
+        const dLen = excerpt.length;
+        const tClass = tLen === 0 ? "" : tLen <= 60 ? "ok" : "over";
+        const dClass = dLen === 0 ? "" : dLen <= 160 ? "ok" : "over";
+        titleHint.textContent = `Kichwa: ${tLen}/60`;
+        titleHint.className = tClass;
+        descHint.textContent = `Desc: ${dLen}/160`;
+        descHint.className = dClass;
+      }
+
+      // ============================================================
+      //  SUCCESS SCREEN
+      // ============================================================
+      function showSuccessScreen(headline, category, tags) {
+        document.getElementById("success-headline-display").textContent = headline;
+        const metaEl = document.getElementById("success-meta-row");
+        metaEl.innerHTML = `
+          <span>📁 ${category}</span>
+          <span>🏷 ${tags || "Hakuna tags"}</span>
+          <span>🕐 ${new Date().toLocaleTimeString("sw", { hour: "2-digit", minute: "2-digit" })}</span>
+        `;
+        document.getElementById("success-screen").classList.add("show");
+      }
+
+      function writeNewArticle() {
+        document.getElementById("success-screen").classList.remove("show");
+        document.getElementById("headline").value = "";
+        document.getElementById("excerpt").value = "";
+        editor.innerHTML = "";
+        catSelected.textContent = "Chagua category...";
+        document.querySelectorAll('input[name="category"]').forEach((r) => (r.checked = false));
+        tagsData.clear();
+        document.querySelectorAll(".tag-chip").forEach((c) => c.remove());
+        deleteCoverImage();
+        document.getElementById("verify").checked = false;
+        document.getElementById("submitBtn").disabled = true;
+        document.getElementById("status-msg").style.display = "none";
+        localStorage.removeItem("mnyilinga_draft");
+        updateCharCount();
+        updateExcerptCount();
+        updateWordCount();
+        updateTagStats();
+        updateSeoPreview();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      // ============================================================
+      //  IMAGE CROPPER ENGINE
+      // ============================================================
+      const CROP_OUT_W = 1200, CROP_OUT_H = 800;
+      const CROP_TOLERANCE = 2;
+
+      let cropperImg = null, cropperOrigFile = null, cropperBaseScale = 1, cropperScale = 1;
+      let cropperX = 0, cropperY = 0;
+      let cropperDragging = false, cropperDragStart = { x: 0, y: 0, imgX: 0, imgY: 0 };
+
+      const cropCanvas = document.getElementById("cropperCanvas");
+      const cropCtx = cropCanvas.getContext("2d");
+      const DISP_W = 600, DISP_H = 400;
+
+      function openCropperWithFile(file) {
+        cropperOrigFile = file;
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          cropperImg = img;
+          const isExact = Math.abs(img.naturalWidth - CROP_OUT_W) <= CROP_TOLERANCE &&
+                          Math.abs(img.naturalHeight - CROP_OUT_H) <= CROP_TOLERANCE;
+          const skipNotice = document.getElementById("cropper-skip-notice");
+          const cropStage = document.getElementById("cropperStage");
+          const zoomRow = document.querySelector(".cropper-zoom-row");
+          const applyBtn = document.getElementById("applyCropBtn");
+          if (isExact) {
+            skipNotice.classList.add("show");
+            cropStage.style.display = "none";
+            zoomRow.style.display = "none";
+            applyBtn.textContent = "Pakia Moja kwa Moja →";
+            openModal("cropperModal");
+            setTimeout(() => applyCrop(true), 900);
+          } else {
+            skipNotice.classList.remove("show");
+            cropStage.style.display = "block";
+            zoomRow.style.display = "flex";
+            applyBtn.textContent = "Tumia Picha →";
+            const scaleX = DISP_W / img.naturalWidth;
+            const scaleY = DISP_H / img.naturalHeight;
+            cropperBaseScale = Math.max(scaleX, scaleY);
+            cropperScale = 1;
+            const iw = img.naturalWidth * cropperBaseScale;
+            const ih = img.naturalHeight * cropperBaseScale;
+            cropperX = (DISP_W - iw) / 2;
+            cropperY = (DISP_H - ih) / 2;
+            const zoomSlider = document.getElementById("cropZoom");
+            zoomSlider.value = 1;
+            document.getElementById("cropZoomVal").textContent = "1.0×";
+            drawCropper();
+            openModal("cropperModal");
+          }
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); toast("❌ Picha haiwezi kusomwa — jaribu tena", "error"); };
+        img.src = url;
+      }
+
+      function drawCropper() {
+        cropCtx.clearRect(0, 0, DISP_W, DISP_H);
+        cropCtx.fillStyle = "#060d1a";
+        cropCtx.fillRect(0, 0, DISP_W, DISP_H);
+        if (!cropperImg) return;
+        const s = cropperBaseScale * cropperScale;
+        const iw = cropperImg.naturalWidth * s;
+        const ih = cropperImg.naturalHeight * s;
+        cropCtx.drawImage(cropperImg, cropperX, cropperY, iw, ih);
+        cropCtx.strokeStyle = "rgba(253,185,19,0.15)";
+        cropCtx.lineWidth = 1;
+        for (let i = 1; i < 3; i++) {
+          cropCtx.beginPath();
+          cropCtx.moveTo((DISP_W * i) / 3, 0); cropCtx.lineTo((DISP_W * i) / 3, DISP_H); cropCtx.stroke();
+          cropCtx.beginPath();
+          cropCtx.moveTo(0, (DISP_H * i) / 3); cropCtx.lineTo(DISP_W, (DISP_H * i) / 3); cropCtx.stroke();
+        }
+        cropCtx.strokeStyle = "#fdb913";
+        cropCtx.lineWidth = 2;
+        cropCtx.strokeRect(1, 1, DISP_W - 2, DISP_H - 2);
+      }
+
+      function clampCropper() {
+        const s = cropperBaseScale * cropperScale;
+        const iw = cropperImg.naturalWidth * s;
+        const ih = cropperImg.naturalHeight * s;
+        cropperX = Math.min(0, Math.max(DISP_W - iw, cropperX));
+        cropperY = Math.min(0, Math.max(DISP_H - ih, cropperY));
+      }
+
+      cropCanvas.addEventListener("mousedown", (e) => {
+        cropperDragging = true;
+        cropperDragStart = { x: e.clientX, y: e.clientY, imgX: cropperX, imgY: cropperY };
+        cropCanvas.style.cursor = "grabbing";
+      });
+      document.addEventListener("mousemove", (e) => {
+        if (!cropperDragging) return;
+        cropperX = cropperDragStart.imgX + (e.clientX - cropperDragStart.x);
+        cropperY = cropperDragStart.imgY + (e.clientY - cropperDragStart.y);
+        clampCropper(); drawCropper();
+      });
+      document.addEventListener("mouseup", () => { cropperDragging = false; cropCanvas.style.cursor = "crosshair"; });
+      cropCanvas.addEventListener("touchstart", (e) => {
+        if (e.touches.length !== 1) return;
+        const t = e.touches[0];
+        cropperDragging = true;
+        cropperDragStart = { x: t.clientX, y: t.clientY, imgX: cropperX, imgY: cropperY };
+      }, { passive: true });
+      cropCanvas.addEventListener("touchmove", (e) => {
+        if (!cropperDragging || e.touches.length !== 1) return;
+        e.preventDefault();
+        const t = e.touches[0];
+        cropperX = cropperDragStart.imgX + (t.clientX - cropperDragStart.x);
+        cropperY = cropperDragStart.imgY + (t.clientY - cropperDragStart.y);
+        clampCropper(); drawCropper();
+      }, { passive: false });
+      cropCanvas.addEventListener("touchend", () => { cropperDragging = false; });
+
+      document.getElementById("cropZoom").addEventListener("input", function () {
+        const prevScale = cropperScale;
+        cropperScale = parseFloat(this.value);
+        document.getElementById("cropZoomVal").textContent = cropperScale.toFixed(1) + "×";
+        const centerX = DISP_W / 2, centerY = DISP_H / 2;
+        const ratio = cropperScale / prevScale;
+        cropperX = centerX - (centerX - cropperX) * ratio;
+        cropperY = centerY - (centerY - cropperY) * ratio;
+        clampCropper(); drawCropper();
+      });
+
+      async function applyCrop(skipCrop = false) {
+        const applyBtn = document.getElementById("applyCropBtn");
+        applyBtn.disabled = true;
+        applyBtn.textContent = "⚙ Inafanya kazi...";
+        try {
+          let webpFile;
+          if (skipCrop) {
+            webpFile = await convertToWebP(cropperOrigFile);
+          } else {
+            const s = cropperBaseScale * cropperScale;
+            const cropX = -cropperX / s;
+            const cropY = -cropperY / s;
+            const cropW = DISP_W / s;
+            const cropH = DISP_H / s;
+            const outCanvas = document.createElement("canvas");
+            outCanvas.width = CROP_OUT_W;
+            outCanvas.height = CROP_OUT_H;
+            const outCtx = outCanvas.getContext("2d");
+            outCtx.drawImage(cropperImg, cropX, cropY, cropW, cropH, 0, 0, CROP_OUT_W, CROP_OUT_H);
+            const blob = await new Promise((res) => outCanvas.toBlob(res, "image/webp", 0.88));
+            if (!blob) throw new Error("Crop blob haikufanikiwa");
+            const baseName = cropperOrigFile.name.replace(/\.[^/.]+$/, "");
+            webpFile = new File([blob], baseName + ".webp", { type: "image/webp", lastModified: Date.now() });
+          }
+          const dt = new DataTransfer();
+          dt.items.add(webpFile);
+          fileInput.files = dt.files;
+          showCoverPreview(webpFile);
+          showWebPBadge(cropperOrigFile, webpFile, coverInfoT);
+          closeModal("cropperModal");
+          toast("✦ Picha imehifadhiwa kama WebP 1200×800", "ok");
+        } catch (err) {
+          toast("❌ " + err.message, "error");
+        } finally {
+          applyBtn.disabled = false;
+          applyBtn.textContent = "Tumia Picha →";
+        }
+      }
+
+      function cancelCrop() {
+        closeModal("cropperModal");
+        fileInput.value = "";
+        previewImg.style.display = "none";
+        coverDel.style.display = "none";
+        coverInfo.classList.remove("visible");
+        coverInfo.style.display = "none";
+      }
+
+      // ============================================================
+      //  CLOCK — start immediately (no lock screen)
+      // ============================================================
+      function startClock() {
+        const el = document.getElementById("topbar-clock");
+        function tick() {
+          const now = new Date();
+          el.textContent = now.toLocaleTimeString("sw", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        }
+        tick();
+        setInterval(tick, 1000);
+      }
+      startClock();
+
+      // ============================================================
+      //  COVER IMAGE — preview, delete, drag & drop
+      // ============================================================
+      const fileInput = document.getElementById("file-input");
+      const previewImg = document.getElementById("preview-img");
+      const uploadZone = document.getElementById("upload-zone");
+      const coverDel = document.getElementById("cover-delete-btn");
+      const coverInfo = document.getElementById("cover-info");
+      const coverInfoT = document.getElementById("cover-info-text");
+
+      fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        openCropperWithFile(file);
+      };
+
+      function showCoverPreview(file) {
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          previewImg.src = re.target.result;
+          previewImg.style.display = "block";
+          coverDel.style.display = "flex";
+          coverInfo.classList.add("visible");
+          coverInfo.style.display = "flex";
+          coverInfoT.textContent = `${file.name} (${(file.size / 1024).toFixed(0)} KB)`;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function deleteCoverImage() {
+        previewImg.src = "#";
+        previewImg.style.display = "none";
+        coverDel.style.display = "none";
+        coverInfo.classList.remove("visible");
+        fileInput.value = "";
+      }
+
+      uploadZone.addEventListener("dragover", (e) => { e.preventDefault(); uploadZone.style.borderColor = "var(--yellow)"; });
+      uploadZone.addEventListener("dragleave", () => { uploadZone.style.borderColor = ""; });
+      uploadZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadZone.style.borderColor = "";
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith("image/")) openCropperWithFile(file);
+      });
+
+      // ============================================================
+      //  CATEGORY DROPDOWN
+      // ============================================================
+      const catTrigger = document.getElementById("catTrigger");
+      const catList = document.getElementById("catList");
+      const catSelected = document.getElementById("catSelected");
+
+      catTrigger.onclick = () => { catList.classList.toggle("show"); catTrigger.classList.toggle("open"); };
+      document.querySelectorAll('input[name="category"]').forEach((r) => {
+        r.onclick = () => {
+          catSelected.textContent = r.value;
+          catList.classList.remove("show");
+          catTrigger.classList.remove("open");
+          document.getElementById("ip-cat").textContent = r.value;
+        };
+      });
+      document.addEventListener("click", (e) => {
+        if (!catTrigger.contains(e.target) && !catList.contains(e.target)) {
+          catList.classList.remove("show");
+          catTrigger.classList.remove("open");
+        }
+      });
+
+      // ============================================================
+      //  CHAR COUNTERS
+      // ============================================================
+      function updateCharCount() {
+        const v = document.getElementById("headline").value.length;
+        const el = document.getElementById("charCounter");
+        el.textContent = v + " / 120";
+        el.className = "char-counter" + (v > 100 ? " warn" : "") + (v >= 120 ? " over" : "");
+      }
+      function updateExcerptCount() {
+        const v = document.getElementById("excerpt").value.length;
+        const el = document.getElementById("excerptCounter");
+        el.textContent = v + " / 200";
+        el.className = "char-counter" + (v > 160 ? " warn" : "") + (v >= 200 ? " over" : "");
+      }
+
+      // ============================================================
+      //  TAGS
+      // ============================================================
+      const tagsData = new Set();
+      const tagInput = document.getElementById("tag-input");
+
+      tagInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === ",") {
+          e.preventDefault();
+          const val = tagInput.value.trim().replace(/,/g, "");
+          if (val && !tagsData.has(val)) addTag(val);
+          tagInput.value = "";
+        }
+        if (e.key === "Backspace" && !tagInput.value) {
+          const last = [...tagsData].pop();
+          if (last) removeTag(last);
+        }
+      });
+
+      function addTag(val) {
+        tagsData.add(val);
+        const chip = document.createElement("div");
+        chip.className = "tag-chip";
+        chip.dataset.tag = val;
+        chip.innerHTML = `<span>${val}</span><button class="tag-chip-del" onclick="removeTag('${val.replace(/'/g, "\\'")}') " type="button">×</button>`;
+        document.getElementById("tags-wrap").insertBefore(chip, tagInput);
+        updateTagStats();
+      }
+      function removeTag(val) {
+        tagsData.delete(val);
+        const chip = document.querySelector(`.tag-chip[data-tag="${val}"]`);
+        if (chip) chip.remove();
+        updateTagStats();
+      }
+      function updateTagStats() {
+        const n = tagsData.size;
+        document.getElementById("sb-tags-count").textContent = n;
+        document.getElementById("ip-tags").textContent = n;
+      }
+
+      // ============================================================
+      //  EDITOR — SELECTION SAVE / RESTORE
+      // ============================================================
+      const editor = document.getElementById("editor");
+      let savedSelection = null;
+
+      function saveSelection() {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) savedSelection = sel.getRangeAt(0).cloneRange();
+      }
+      function saveSelectionEvent(e) { e.preventDefault(); saveSelection(); }
+      function restoreSelection() {
+        if (!savedSelection) return;
+        editor.focus();
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(savedSelection);
+      }
+      editor.addEventListener("keyup", saveSelection);
+      editor.addEventListener("mouseup", saveSelection);
+      editor.addEventListener("touchend", saveSelection);
+
+      // ============================================================
+      //  TOOLBAR COMMANDS
+      // ============================================================
+      function fmt(cmd, val = null) {
+        restoreSelection();
+        document.execCommand(cmd, false, val);
+        editor.focus();
+        updateToolbarState();
+        saveSelection();
+      }
+      function formatBlock(tag) {
+        if (!tag) return;
+        document.execCommand("formatBlock", false, tag);
+        editor.focus();
+      }
+      function insertHR() {
+        restoreSelection();
+        document.execCommand("insertHorizontalRule");
+        editor.focus();
+        saveSelection();
+      }
+      function copyHTMLToClipboard() {
+        navigator.clipboard.writeText(editor.innerHTML)
+          .then(() => toast("✦ HTML imenakiliwa kwenye clipboard!", "ok"))
+          .catch(() => toast("❌ Imeshindwa kunakili HTML", "error"));
+      }
+      function previewArticle() {
+        const headline = document.getElementById("headline").value || "(Kichwa hakijaandikwa)";
+        const article = editor.innerHTML;
+        const w = window.open("", "_blank");
+        w.document.write(`<!doctype html><html><head><meta charset="UTF-8">
+          <title>${headline}</title>
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+          <style>body{font-family:'Inter',sans-serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.8;color:#111;background:#fff}
+          h1{font-size:28px;margin-bottom:8px}img{max-width:100%}blockquote{border-left:3px solid #fdb913;padding:8px 16px;background:#fff9e6;}</style>
+          </head><body><h1>${headline}</h1>${article}</body></html>`);
+        w.document.close();
+      }
+      function clearEditor() {
+        editor.innerHTML = "";
+        closeModal("clearModal");
+        updateWordCount();
+        toast("Editor imefutwa", "info");
+      }
+      function updateToolbarState() {
+        ["bold","italic","underline","strikeThrough"].forEach((cmd) => {
+          const id = { bold:"btn-bold", italic:"btn-italic", underline:"btn-underline", strikeThrough:"btn-strike" }[cmd];
+          const el = document.getElementById(id);
+          if (el) el.classList.toggle("active", document.queryCommandState(cmd));
+        });
+      }
+      editor.addEventListener("keyup", updateToolbarState);
+      editor.addEventListener("mouseup", updateToolbarState);
+
+      // Color pickers
+      document.getElementById("fgPicker").addEventListener("input", function() {
+        document.getElementById("fg-swatch").style.background = this.value;
+      });
+      document.getElementById("fgPicker").addEventListener("change", function() {
+        restoreSelection();
+        document.execCommand("foreColor", false, this.value);
+        editor.focus(); saveSelection();
+      });
+      document.getElementById("bgPicker").addEventListener("input", function() {
+        document.getElementById("bg-swatch").style.background = this.value;
+      });
+      document.getElementById("bgPicker").addEventListener("change", function() {
+        restoreSelection();
+        document.execCommand("hiliteColor", false, this.value);
+        editor.focus(); saveSelection();
+      });
+
+      // Keyboard shortcuts
+      editor.addEventListener("keydown", (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          if (e.key === "b") { e.preventDefault(); fmt("bold"); }
+          if (e.key === "i") { e.preventDefault(); fmt("italic"); }
+          if (e.key === "u") { e.preventDefault(); fmt("underline"); }
+        }
+      });
+
+      // ============================================================
+      //  WORD COUNT & STATS
+      // ============================================================
+      function updateWordCount() {
+        const text = editor.innerText || "";
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const chars = text.length;
+        const imgs = editor.querySelectorAll("img").length;
+        document.getElementById("wordCount").textContent = words + " maneno";
+        document.getElementById("charCount2").textContent = chars + " herufi";
+        document.getElementById("imgCount").textContent = imgs + " picha";
+        document.getElementById("sb-words").textContent = words;
+        document.getElementById("sb-imgs").textContent = imgs;
+        document.getElementById("ip-words").textContent = words;
+        document.getElementById("ip-chars").textContent = chars;
+        document.getElementById("ip-imgs").textContent = imgs;
+      }
+
+      // ============================================================
+      //  AUTO SAVE (localStorage)
+      // ============================================================
+      let autoSaveTimer = null;
+      function autoSave() {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(() => {
+          const draft = {
+            headline: document.getElementById("headline").value,
+            excerpt: document.getElementById("excerpt").value,
+            article: editor.innerHTML,
+            tags: [...tagsData],
+            category: catSelected.textContent,
+          };
+          localStorage.setItem("mnyilinga_draft", JSON.stringify(draft));
+          const el = document.getElementById("topbar-save-status");
+          el.style.display = "block";
+          setTimeout(() => (el.style.display = "none"), 2000);
+        }, 1500);
+      }
+
+      function saveDraft() {
+        autoSave();
+        toast("✦ Rasimu imehifadhiwa!", "ok");
+      }
+
+      // Restore draft on load
+      window.addEventListener("load", () => {
+        const raw = localStorage.getItem("mnyilinga_draft");
+        if (!raw) return;
+        try {
+          const d = JSON.parse(raw);
+          if (d.headline) document.getElementById("headline").value = d.headline;
+          if (d.excerpt) document.getElementById("excerpt").value = d.excerpt;
+          if (d.article) editor.innerHTML = d.article;
+          if (d.tags && d.tags.length) d.tags.forEach((t) => addTag(t));
+          if (d.category && d.category !== "Chagua category...") {
+            catSelected.textContent = d.category;
+            document.getElementById("ip-cat").textContent = d.category;
+            const radio = document.querySelector(`input[name="category"][value="${d.category}"]`);
+            if (radio) radio.checked = true;
+          }
+          updateCharCount();
+          updateExcerptCount();
+          updateWordCount();
+          updateSeoPreview();
+          toast("📂 Rasimu imerejeswa", "info", 3000);
+        } catch (e) {}
+      });
+
+      // ============================================================
+      //  MODALS
+      // ============================================================
+      function openModal(id) { document.getElementById(id).classList.add("show"); }
+      function closeModal(id) { document.getElementById(id).classList.remove("show"); }
+      document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) overlay.classList.remove("show");
+        });
+      });
+
+      // ============================================================
+      //  INLINE IMAGE SELECTED — floating toolbar
+      // ============================================================
+      let selectedImg = null;
+      editor.addEventListener("click", (e) => {
+        const img = e.target.closest("img");
+        if (img && editor.contains(img)) {
+          selectedImg = img;
+          document.querySelectorAll(".editor-body img").forEach((i) => i.classList.remove("selected"));
+          img.classList.add("selected");
+          const tb = document.getElementById("img-toolbar");
+          tb.classList.add("visible");
+          const rect = img.getBoundingClientRect();
+          tb.style.top = (rect.top + window.scrollY - 44) + "px";
+          tb.style.left = rect.left + "px";
+        } else {
+          document.querySelectorAll(".editor-body img").forEach((i) => i.classList.remove("selected"));
+          document.getElementById("img-toolbar").classList.remove("visible");
+          selectedImg = null;
+        }
+      });
+
+      function alignSelectedImg(pos) {
+        if (!selectedImg) return;
+        selectedImg.className = selectedImg.className.replace(/img-(left|right|center)/g, "");
+        selectedImg.style.cssText = "";
+        if (pos === "left") { selectedImg.classList.add("img-left"); selectedImg.style = "float:left;max-width:44%;margin:4px 16px 4px 0;"; }
+        else if (pos === "right") { selectedImg.classList.add("img-right"); selectedImg.style = "float:right;max-width:44%;margin:4px 0 4px 16px;"; }
+        else { selectedImg.classList.add("img-center"); selectedImg.style = "display:block;max-width:100%;margin:12px auto;"; }
+      }
+      function deleteSelectedImg() {
+        if (!selectedImg) return;
+        const fig = selectedImg.closest("figure");
+        if (fig) fig.remove(); else selectedImg.remove();
+        document.getElementById("img-toolbar").classList.remove("visible");
+        selectedImg = null;
+        updateWordCount();
+      }
+
+      // ============================================================
+      //  LINK MODAL
+      // ============================================================
+      function openLinkModal() {
+        document.getElementById("linkText").value = window.getSelection()?.toString() || "";
+        document.getElementById("linkUrl").value = "";
+        openModal("linkModal");
+        setTimeout(() => document.getElementById("linkUrl").focus(), 100);
+      }
+      function insertLink() {
+        const text = document.getElementById("linkText").value.trim();
+        const url = document.getElementById("linkUrl").value.trim();
+        if (!url) { toast("Tafadhali weka URL ya kiungo!", "warn"); return; }
+        closeModal("linkModal");
+        restoreSelection();
+        const sel = window.getSelection();
+        if (sel && sel.toString().length > 0) {
+          document.execCommand("createLink", false, url);
+          editor.querySelectorAll(`a[href="${url}"]`).forEach((a) => { a.target = "_blank"; a.rel = "noopener noreferrer"; });
+        } else if (text) {
+          document.execCommand("insertHTML", false, `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`);
+        } else {
+          document.execCommand("insertHTML", false, `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+        }
+        saveSelection();
+      }
+
+      // ============================================================
+      //  INLINE IMAGE MODAL
+      // ============================================================
+      let imgPos = "center", imgCaption = "";
+      function openImgModal() {
+        imgPos = "center";
+        document.querySelectorAll(".img-pos-btn").forEach((b) => b.classList.remove("sel"));
+        document.getElementById("pos-center").classList.add("sel");
+        document.getElementById("imgCaption").value = "";
+        openModal("imgModal");
+      }
+      function setImgPos(pos) {
+        imgPos = pos;
+        document.querySelectorAll(".img-pos-btn").forEach((b) => b.classList.remove("sel"));
+        document.getElementById("pos-" + pos).classList.add("sel");
+      }
+      function triggerInlineImg() {
+        imgCaption = document.getElementById("imgCaption").value.trim();
+        closeModal("imgModal");
+        document.getElementById("inline-img-input").click();
+      }
+
+      const IMGBB_KEY = "65bd20fae1600fa1dad6725e9bda2c7a";
+
+      document.getElementById("inline-img-input").onchange = async function (e) {
+        const originalFile = e.target.files[0];
+        if (!originalFile) return;
+        restoreSelection();
+        const pid = "img-ph-" + Date.now();
+        document.execCommand("insertHTML", false,
+          `<span id="${pid}" style="opacity:.5;font-style:italic;font-size:13px;font-family:sans-serif;">⚙ Inabadilisha WebP na kupakia...</span>`);
+        try {
+          let uploadFile = originalFile;
+          try { uploadFile = await convertToWebP(originalFile); } catch (convErr) {}
+          const fd = new FormData();
+          fd.append("image", uploadFile);
+          const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
+          const data = await res.json();
+          if (!data.success) throw new Error("ImgBB: " + (data.error?.message || "Hitilafu"));
+          const url = data.data.url;
+          const ph = document.getElementById(pid);
+          if (ph) {
+            let cls = "img-center", style = "display:block;max-width:100%;margin:12px auto;";
+            if (imgPos === "left") { cls = "img-left"; style = "float:left;max-width:44%;margin:4px 16px 4px 0;"; }
+            if (imgPos === "right") { cls = "img-right"; style = "float:right;max-width:44%;margin:4px 0 4px 16px;"; }
+            if (imgCaption) {
+              ph.outerHTML = `<figure style="margin:14px 0;overflow:auto;"><img src="${url}" class="${cls}" style="${style}" alt="${imgCaption}"><figcaption>${imgCaption}</figcaption></figure><p><br></p>`;
+            } else {
+              ph.outerHTML = `<img src="${url}" class="${cls}" style="${style}" alt="Picha"><p><br></p>`;
+            }
+          }
+        } catch (err) {
+          const ph = document.getElementById(pid);
+          if (ph) ph.outerHTML = `<span style="color:var(--red);font-family:sans-serif;font-size:13px;">❌ ${err.message}</span>`;
+        }
+        this.value = "";
+        updateWordCount();
+        saveSelection();
+      };
+
+      // ============================================================
+      //  SCROLL TO SECTION
+      // ============================================================
+      function scrollTo(id) {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      // ============================================================
+      //  SIDEBAR ACTIVE LINK
+      // ============================================================
+      const sections = ["sec-cover","sec-cat","sec-headline","sec-excerpt","sec-tags","sec-article"];
+      window.addEventListener("scroll", () => {
+        let current = sections[0];
+        sections.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el && window.scrollY >= el.offsetTop - 80) current = id;
+        });
+        document.querySelectorAll(".sb-link").forEach((a) => a.classList.remove("active"));
+        const activeMap = {
+          "sec-cover":"Picha Kuu","sec-cat":"Category","sec-headline":"Headline",
+          "sec-excerpt":"Muhtasari","sec-tags":"Tags","sec-article":"Makala"
+        };
+        document.querySelectorAll(".sb-link").forEach((a) => {
+          if (a.textContent.trim() === activeMap[current]) a.classList.add("active");
+        });
+      });
+
+      // ============================================================
+      //  PUBLISH
+      // ============================================================
+      async function handlePublish() {
+        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbxRU38CN-Xnu7FOokZ7bzKXrxljegpDtpUPmRWCm06zBDEFfUl0ftbOlNUUNX_nAs5u/exec";
+        const coverFile = fileInput.files[0];
+        const category = catSelected.textContent;
+        const headlineText = document.getElementById("headline").value.trim();
+        const excerptText = document.getElementById("excerpt").value.trim();
+        const articleHTML = editor.innerHTML.trim();
+        const tagsArr = [...tagsData];
+
+        const missing = [];
+        if (!coverFile) missing.push("Picha Kuu");
+        if (category === "Chagua category...") missing.push("Category");
+        if (!headlineText) missing.push("Headline");
+        if (!articleHTML || articleHTML === "") missing.push("Makala");
+
+        if (missing.length > 0) { toast("⚠ Kamilisha: " + missing.join(" · "), "warn", 5000); return; }
+
+        const submitBtn = document.getElementById("submitBtn");
+        const statusMsg = document.getElementById("status-msg");
+        submitBtn.disabled = true;
+        statusMsg.style.display = "block";
+
+        try {
+          let uploadFile = coverFile;
+          if (coverFile.type !== "image/webp") {
+            statusMsg.textContent = "⚙ Inabadilisha picha kuwa WebP...";
+            try { uploadFile = await convertToWebP(coverFile); } catch (e) { uploadFile = coverFile; }
+          }
+          statusMsg.textContent = "⏳ Inapakia picha kuu (WebP)...";
+          const fd = new FormData();
+          fd.append("image", uploadFile);
+          const imgRes = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
+          const imgData = await imgRes.json();
+          if (!imgData.success) throw new Error("ImgBB: " + (imgData.error?.message || "Picha imekataliwa"));
+          statusMsg.textContent = "📡 Inahifadhi kwenye Google Sheet...";
+          const payload = { picha_url: imgData.data.url, category, headline: headlineText, excerpt: excerptText, tags: tagsArr.join(", "), article: articleHTML };
+          await fetch(GOOGLE_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(payload) });
+          localStorage.removeItem("mnyilinga_draft");
+          statusMsg.style.display = "none";
+          showSuccessScreen(headlineText, category, tagsArr.join(", "));
+        } catch (err) {
+          console.error(err);
+          toast("❌ Hitilafu: " + err.message, "error", 7000);
+          submitBtn.disabled = false;
+          statusMsg.style.display = "none";
+          document.getElementById("verify").checked = false;
+        }
+      }
+    </script>
+  </body>
+</html>
