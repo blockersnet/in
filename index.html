@@ -3,189 +3,261 @@
 <head>
 <meta charset="UTF-8">
 <title>Mnyilinga Tools</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="robots" content="noindex, nofollow">
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Inter',sans-serif;
-}
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --orange: #fba007;
+    --purple: #6e55dc;
+    --green:  #0eb24c;
+    --orange-dim: rgba(251,160,7,0.07);
+    --bg:    #080808;
+    --card:  #0c0c0c;
+    --border: rgba(251,160,7,0.2);
+    --text:  #f0f0f0;
+    --muted: #555;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 28px 18px 44px;
+    font-family: 'Inter', sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
+    position: relative;
+  }
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(251,160,7,0.025) 1px, transparent 1px),
+      linear-gradient(90deg,rgba(251,160,7,0.025) 1px,transparent 1px);
+    background-size:44px 44px;
+    pointer-events:none; z-index:0;
+  }
+  body::after {
+    content:'';
+    position:fixed; top:-100px; left:50%; transform:translateX(-50%);
+    width:300px; height:220px;
+    background:radial-gradient(ellipse,rgba(110,85,220,0.1) 0%,transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+  .header {
+    position:relative; z-index:1;
+    display:flex; flex-direction:column; align-items:center;
+    margin-bottom:26px;
+  }
+  .logo-wrap {
+    width:60px; height:60px; margin-bottom:12px;
+    filter:drop-shadow(0 0 14px rgba(110,85,220,0.45));
+  }
+  .logo-wrap svg { width:100%; height:100%; }
+  h1 {
+    font-size:20px; font-weight:800; color:#fff;
+    letter-spacing:-0.5px; margin-bottom:4px;
+  }
+  h1 span { color:var(--orange); }
+  .subtitle {
+    font-size:10px; font-weight:500; color:var(--muted);
+    letter-spacing:2px; text-transform:uppercase;
+  }
+  .divider {
+    width:36px; height:2px; border-radius:2px; margin-top:12px;
+    background:linear-gradient(90deg, var(--purple), var(--orange), var(--green));
+  }
+  .section-label {
+    position:relative; z-index:1;
+    font-size:9px; font-weight:600;
+    letter-spacing:2.5px; text-transform:uppercase;
+    color:var(--muted); margin-bottom:10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-label::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg, var(--border), transparent);
+  }
+  .grid {
+    position:relative; z-index:1;
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  }
+  .box {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:18px; padding:18px 12px;
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:9px; cursor:pointer;
+    transition:all 0.2s cubic-bezier(0.25,0.46,0.45,0.94);
+    text-align:center; min-height:116px;
+    position:relative; overflow:hidden;
+  }
+  .box::before {
+    content:''; position:absolute; top:0; left:25%; right:25%; height:1px;
+    background:linear-gradient(90deg,transparent,var(--orange),transparent);
+    opacity:0; transition:opacity 0.25s;
+  }
+  .box:hover::before,.box:active::before { opacity:1; }
+  .box:hover {
+    border-color:rgba(251,160,7,0.5); background:#0f0e09;
+    box-shadow:0 8px 28px rgba(251,160,7,0.12);
+    transform:translateY(-3px) scale(1.02);
+  }
+  .box:active { transform:scale(0.97); }
 
-body{
-  background:#000;
-  color:#fff;
-  height:100vh;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  padding:30px;
-}
+  .box.featured {
+    grid-column:1 / -1;
+    flex-direction:row; justify-content:flex-start; align-items:center;
+    gap:14px; padding:18px 20px; min-height:auto;
+    border-color:rgba(251,160,7,0.45);
+    background:linear-gradient(135deg,#100e04,#0c0c0c);
+  }
+  .box.featured .box-text { text-align:left; }
+  .box.featured::before { left:8%; right:8%; opacity:0.5; }
 
-/* HEADER */
-h1{
-  font-size:20px;
-  color:orange;
-  margin-bottom:4px;
-  text-align:center;
-}
+  .badge {
+    position:absolute; top:10px; right:14px;
+    font-size:8px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+    color:#000; background:var(--orange); padding:2px 7px; border-radius:20px;
+  }
+  .icon-wrap {
+    width:42px; height:42px; border-radius:12px;
+    background:var(--orange-dim); border:1px solid rgba(251,160,7,0.15);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; transition:all 0.2s;
+  }
+  .box:hover .icon-wrap {
+    background:rgba(251,160,7,0.13);
+    border-color:rgba(251,160,7,0.35);
+  }
+  .icon-wrap svg {
+    width:20px; height:20px;
+    stroke:var(--orange); stroke-width:1.7;
+    fill:none; stroke-linecap:round; stroke-linejoin:round;
+  }
+  .box.featured .icon-wrap {
+    width:46px; height:46px; border-radius:13px;
+    background:rgba(251,160,7,0.1); border-color:rgba(251,160,7,0.3);
+  }
+  .box.featured .icon-wrap svg { width:22px; height:22px; }
 
-p{
-  font-size:12px;
-  color:#aaa;
-  margin-bottom:12px;
-  text-align:center;
-}
+  .box-text h3 {
+    font-size:13px; font-weight:700; color:#fff;
+    margin-bottom:3px; letter-spacing:-0.1px;
+  }
+  .box-text p { font-size:9.5px; font-weight:400; color:var(--muted); letter-spacing:0.2px; line-height:1.4; }
 
-/* GRID */
-.grid{
-  flex:1;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  justify-items:center;
-  align-items:center;
-}
-
-/* BOX STYLE */
-.box{
-  background:linear-gradient(145deg,#0d0d0d,#111);
-  border:1px solid #ffa500;
-  border-radius:18px;
-  width:120px;
-  height:120px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  transition:0.25s;
-  text-align:center;
-  padding:10px;
-  box-shadow:0 4px 8px rgba(255, 166, 2, 0);
-}
-
-.box:hover{
-  border-color:#ffa500;
-  box-shadow:0 6px 12px rgba(255,165,0,0.4);
-  transform:translateY(-3px);
-}
-
-/* ICON */
-.icon{
-  width:36px;
-  height:36px;
-  stroke:orange;
-  stroke-width:1.8;
-  fill:none;
-  margin-bottom:6px;
-}
-
-/* TEXT */
-.box h3{
-  font-size:13px;
-  margin-bottom:2px;
-}
-
-.box p{
-  font-size:10px;
-  color:#bbb;
-}
-
-
-/* Zima text selection kwenye body yote */
-body {
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none;    /* Firefox */
-  -ms-user-select: none;     /* IE/Edge */
-  user-select: none;         /* Standard */
-}
-
-
-
-
-
-  
-
+  @keyframes ripple {
+    0%   { transform:scale(0); opacity:0.45; }
+    100% { transform:scale(5); opacity:0; }
+  }
+  .ripple {
+    position:absolute; width:24px; height:24px; border-radius:50%;
+    background:rgba(251,160,7,0.35); pointer-events:none;
+    animation:ripple 0.45s ease-out forwards; transform-origin:center;
+  }
+  ::-webkit-scrollbar { width:3px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:10px; }
 </style>
 </head>
-
 <body>
 
-<h1>Mnyilinga Tools</h1>
-<p>Quick access to all tools from one screen</p>
+<div class="header">
+  <div class="logo-wrap">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080">
+      <g>
+        <g>
+          <polygon points="518.61 108.53 364.75 216.75 364.75 224.82 364.75 347.85 364.75 349.21 364.75 472.24 364.75 480.31 518.61 588.53 518.61 108.53" fill="#6e55dc"/>
+          <polygon points="560.17 588.53 714.03 480.31 714.03 349.21 714.03 347.85 714.03 216.75 560.17 108.53 560.17 588.53" fill="#fba007"/>
+        </g>
+        <g>
+          <polygon points="495.78 619.87 326.38 538.09 319.34 542.01 211.84 601.86 210.66 602.52 103.16 662.38 96.11 666.3 76.41 853.37 495.78 619.87" fill="#0eb24c"/>
+          <polygon points="96.63 889.69 266.03 971.47 380.57 907.69 381.75 907.04 496.3 843.26 516 656.19 96.63 889.69" fill="#fba007"/>
+        </g>
+        <g>
+          <polygon points="1003.59 844.26 979.99 657.64 972.87 653.86 864.15 596.26 862.95 595.63 754.23 538.03 747.1 534.25 579.44 619.54 1003.59 844.26" fill="#0eb24c"/>
+          <polygon points="559.98 656.28 583.58 842.9 699.43 904.27 700.63 904.91 816.47 966.28 984.13 880.99 559.98 656.28" fill="#6e55dc"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+  <h1>Mnyilinga <span>Tools</span></h1>
+  <p class="subtitle">Quick Access · All Tools</p>
+  <div class="divider"></div>
+</div>
+
+<div class="section-label">Zana Zote</div>
 
 <div class="grid">
 
-  <!-- BOX 1 -->
-  <div class="box" onclick="go('https://mnyilinga.co.tz/tools/siri-confess-hub')">
-    <svg class="icon" viewBox="0 0 24 24">
-      <path d="M12 3l8 4v5c0 5-3.5 9-8 10-4.5-1-8-5-8-10V7l8-4z"/>
-    </svg>
-    <h3>Siri Board</h3>
-    <p>Private content</p>
+  <div class="box featured" onclick="go(this,'https://admin.mnyilinga.co.tz/tools/user-dashboard/post')">
+    <span class="badge">NEW</span>
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    </div>
+    <div class="box-text">
+      <h3>Post Habari</h3>
+      <p>Chapisha habari mpya</p>
+    </div>
   </div>
 
-  <!-- BOX 2 -->
-  <div class="box" onclick="go('https://mnyilinga.co.tz/siri')">
-    <svg class="icon" viewBox="0 0 24 24">
-      <path d="M4 4h16v16H4z"/>
-      <path d="M8 8h8v8H8z"/>
-    </svg>
-    <h3>Poster Editor</h3>
-    <p>Create & edit designs</p>
+  <div class="box" onclick="go(this,'https://mnyilinga.co.tz/tools/siri-confess-hub')">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <div class="box-text"><h3>Siri Board</h3><p>Private content</p></div>
   </div>
 
-  <!-- BOX 3 -->
-  <div class="box" onclick="go('https://mnyilinga.co.tz/siri')">
-    <svg class="icon" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="9"/>
-    </svg>
-    <h3>Main Website</h3>
-    <p>Your platform</p>
+  <div class="box" onclick="go(this,'https://mnyilinga.co.tz/siri')">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+    </div>
+    <div class="box-text"><h3>Poster Editor</h3><p>Create & edit designs</p></div>
   </div>
 
-  <!-- BOX 4 -->
-  <div class="box" onclick="go('https://mnyilinga.co.tz/siri')">
-    <svg class="icon" viewBox="0 0 24 24">
-      <path d="M12 16V4"/>
-      <path d="M8 8l4-4 4 4"/>
-      <path d="M4 20h16"/>
-    </svg>
-    <h3>Upload</h3>
-    <p>Manage files</p>
+  <div class="box" onclick="go(this,'https://mnyilinga.co.tz')">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+    </div>
+    <div class="box-text"><h3>Main Website</h3><p>Your platform</p></div>
   </div>
 
-  <!-- BOX 5 -->
-  <div class="box" onclick="go('https://mnyilinga.co.tz/siri')">
-    <svg class="icon" viewBox="0 0 24 24">
-      <path d="M3 12h18"/>
-    </svg>
-    <h3>Logs</h3>
-    <p>System info</p>
+  <div class="box" onclick="go(this,'https://mnyilinga.co.tz/siri')">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+    </div>
+    <div class="box-text"><h3>Upload</h3><p>Manage files</p></div>
   </div>
 
-  <!-- BOX 6 -->
-  <div class="box" onclick="go('https://mnyilinga.co.tz/siri')">
-    <svg class="icon" viewBox="0 0 24 24">
-      <path d="M12 6v6l4 2"/>
-    </svg>
-    <h3>Tasks</h3>
-    <p>Manager</p>
+  <div class="box" onclick="go(this,'https://mnyilinga.co.tz/siri')">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+    </div>
+    <div class="box-text"><h3>Logs</h3><p>System info</p></div>
+  </div>
+
+  <div class="box" onclick="go(this,'https://mnyilinga.co.tz/siri')">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><polyline points="3 6 4 7 6 5"/><polyline points="3 12 4 13 6 11"/><polyline points="3 18 4 19 6 17"/></svg>
+    </div>
+    <div class="box-text"><h3>Tasks</h3><p>Manager</p></div>
   </div>
 
 </div>
 
-
-
 <script>
-function go(url){
-  window.location.href = url;
+function go(el,url){
+  var r=document.createElement('span');
+  r.className='ripple';
+  r.style.left=(el.offsetWidth/2-12)+'px';
+  r.style.top=(el.offsetHeight/2-12)+'px';
+  el.appendChild(r);
+  setTimeout(function(){r.remove()},450);
+  setTimeout(function(){window.location.href=url},180);
 }
 </script>
-
 </body>
 </html>
