@@ -2695,6 +2695,11 @@
         const headlineText = document.getElementById("headline").value.trim();
         const excerptText = document.getElementById("excerpt").value.trim();
         const articleHTML = editor.innerHTML.trim();
+        // ✅ FIX: Capture any unconfirmed tag still typed in the input field
+        const pendingTag = tagInput.value.trim().replace(/,/g, "");
+        if (pendingTag && !tagsData.has(pendingTag)) addTag(pendingTag);
+        tagInput.value = "";
+
         const tagsArr = [...tagsData];
 
         const missing = [];
