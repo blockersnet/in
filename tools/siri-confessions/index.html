@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Siri Board Ultra | Live Feed</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="Siri Board Ultra – Soma na ushiriki siri za watu halisi. Anonymous, salama, na ya kweli.">
+    <meta name="theme-color" content="#010307">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;900&family=Poppins:wght@400;500;600;700&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+/* ============================================================
+   DESIGN SYSTEM – CSS VARIABLES (Theme 1:  Default)
+   ============================================================ */
+:root {
+    --bg:            #010307;
+    --bg-card:       rgba(10, 16, 34, 0.85);
+    --bg-card-hover: rgba(14, 22, 46, 0.95);
+    --neon:          #00f2fe;
+    --neon-dim:      rgba(0, 242, 254, 0.15);
+    --neon-rgb:      0, 242, 254;
+    --purple:        #764ba2;
+    --purple-dim:    rgba(118, 75, 162, 0.15);
+    --border:        rgba(255, 255, 255, 0.07);
+    --border-neon:   rgba(0, 242, 254, 0.35);
+    --text-primary:  #f1f5f9;
+    --text-secondary:#94a3b8;
+    --text-muted:    #475569;
+    --success:       #10b981;
+    --danger:        #f43f5e;
+    --radius-sm:     8px;
+    --radius-md:     14px;
+    --radius-lg:     20px;
+    --radius-full:   999px;
+    --shadow-card:   0 4px 24px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.04) inset;
+    --transition:    0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Theme 2: Cyber Gold */
+[data-theme="gold"] {
+    --neon:        #f5c518;
+    --neon-dim:    rgba(245, 197, 24, 0.15);
+    --neon-rgb:    245, 197, 24;
+    --purple:      #e87c3e;
+    --purple-dim:  rgba(232, 124, 62, 0.15);
+    --border-neon: rgba(245, 197, 24, 0.35);
+}
+
+/* Theme 3: Crimson */
+[data-theme="crimson"] {
+    --neon:        #ff4d6d;
+    --neon-dim:    rgba(255, 77, 109, 0.15);
+    --neon-rgb:    255, 77, 109;
+    --purple:      #c9184a;
+    --purple-dim:  rgba(201, 24, 74, 0.15);
+    --border-neon: rgba(255, 77, 109, 0.35);
+}
+
+/* Theme 4: Matrix Green */
+[data-theme="matrix"] {
+    --neon:        #00ff88;
+    --neon-dim:    rgba(0, 255, 136, 0.15);
+    --neon-rgb:    0, 255, 136;
+    --purple:      #00b894;
+    --purple-dim:  rgba(0, 184, 148, 0.15);
+    --border-neon: rgba(0, 255, 136, 0.35);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after {
+    margin: 0; padding: 0;
+    box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg);
+    background-image:
+        radial-gradient(ellipse 80% 40% at 80% 0%, rgba(118,75,162,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 30% at 10% 90%, rgba(0,242,254,0.08) 0%, transparent 50%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+button {
+    cursor: pointer;
+    width: auto;
+    max-width: none;
+    font-family: 'Poppins', sans-serif;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* ============================================================
+   THEME SWITCHER
+   ============================================================ */
+.theme-switcher {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 4px 8px;
+}
+
+.theme-switcher-label {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-right: 2px;
+    white-space: nowrap;
+}
+
+.theme-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+    background: none;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.theme-dot::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: 50%;
+}
+
+.theme-dot:hover { transform: scale(1.25); }
+.theme-dot.active { border-color: white; transform: scale(1.2); }
+
+.theme-dot.t-neon::after    { background: linear-gradient(135deg, #00f2fe, #764ba2); }
+.theme-dot.t-gold::after    { background: linear-gradient(135deg, #f5c518, #e87c3e); }
+.theme-dot.t-crimson::after { background: linear-gradient(135deg, #ff4d6d, #c9184a); }
+.theme-dot.t-matrix::after  { background: linear-gradient(135deg, #00ff88, #00b894); }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 14px 5%;
+    background: rgba(4, 7, 18, 0.9);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    z-index: 1000;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+/* TITLE uses Inter font as requested */
+.logo {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--neon) 0%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+#update-timer {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    background: rgba(0,242,254,0.06);
+    border: 1px solid rgba(0,242,254,0.12);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+    transition: color 0.3s;
+}
+
+#update-timer.refreshing {
+    color: var(--neon);
+    border-color: rgba(0,242,254,0.3);
+    animation: timerPulse 1s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* SEARCH BOX */
+.search-wrapper { position: relative; }
+
+.search-box { position: relative; width: 100%; }
+
+.search-box input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    padding: 11px 16px 11px 42px;
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-family: 'Poppins', sans-serif;
+    outline: none;
+    transition: var(--transition);
+}
+
+.search-box input:focus {
+    border-color: var(--border-neon);
+    background: rgba(var(--neon-rgb), 0.04);
+    box-shadow: 0 0 0 3px rgba(var(--neon-rgb), 0.08);
+}
+
+.search-box input::placeholder { color: var(--text-muted); }
+
+.search-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    pointer-events: none;
+    transition: color 0.2s;
+}
+
+.search-box:focus-within .search-icon { color: var(--neon); }
+
+.search-clear {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    color: var(--text-muted); cursor: pointer;
+    font-size: 0.8rem; padding: 4px;
+    display: none; transition: color 0.2s;
+}
+.search-clear:hover { color: var(--text-primary); }
+.search-clear.visible { display: block; }
+
+.search-ai-badge {
+    display: inline-flex;
+    align-items: center; gap: 4px;
+    font-size: 0.6rem; color: var(--neon);
+    background: rgba(var(--neon-rgb), 0.06);
+    border: 1px solid rgba(var(--neon-rgb), 0.15);
+    padding: 2px 8px; border-radius: var(--radius-full);
+    position: absolute; right: 36px; top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; opacity: 0;
+    transition: opacity 0.3s; white-space: nowrap;
+}
+.search-box input:focus ~ .search-ai-badge { opacity: 1; }
+
+#search-results-info {
+    font-size: 0.72rem; color: var(--text-muted);
+    padding: 6px 2px 0; display: none;
+}
+#search-results-info.visible { display: block; }
+#search-results-info strong { color: var(--neon); }
+
+/* ============================================================
+   MAIN LAYOUT
+   ============================================================ */
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 16px 60px;
+    padding-top: 145px;
+}
+
+@media (max-width: 480px) { .container { padding-top: 155px; } }
+
+/* ============================================================
+   LOADER
+   ============================================================ */
+.loader-wrapper {
+    text-align: center; padding: 60px 20px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 16px;
+}
+
+.spinner {
+    width: 36px; height: 36px;
+    border: 2.5px solid rgba(var(--neon-rgb), 0.08);
+    border-top-color: var(--neon);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loader-text {
+    font-size: 0.8rem; color: var(--text-muted);
+    max-width: 260px; line-height: 1.7;
+}
+
+.error-state {
+    text-align: center; padding: 50px 20px; display: none;
+}
+.error-state i { font-size: 2rem; color: var(--danger); margin-bottom: 12px; display: block; }
+.error-state p { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 16px; }
+
+.retry-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: var(--radius-full);
+    background: rgba(var(--neon-rgb), 0.08); border: 1px solid var(--border-neon);
+    color: var(--neon); font-size: 0.8rem;
+    font-weight: 600; transition: var(--transition);
+}
+.retry-btn:hover { background: rgba(var(--neon-rgb), 0.14); transform: translateY(-1px); }
+
+.empty-state {
+    text-align: center; padding: 50px 20px; display: none;
+}
+.empty-state i { font-size: 2.2rem; color: var(--text-muted); margin-bottom: 14px; display: block; }
+.empty-state h3 { font-size: 1rem; color: var(--text-secondary); margin-bottom: 6px; }
+.empty-state p { font-size: 0.8rem; color: var(--text-muted); }
+
+/* ============================================================
+   MESSAGE GRID
+   ============================================================ */
+.message-grid { display: grid; gap: 16px; }
+
+/* ============================================================
+   MESSAGE CARD
+   ============================================================ */
+.msg-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+    box-shadow: var(--shadow-card);
+    animation: cardSlideIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    will-change: transform;
+}
+
+.msg-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(var(--neon-rgb), 0.3), transparent);
+    opacity: 0; transition: opacity 0.3s;
+}
+
+.msg-card:hover {
+    border-color: rgba(var(--neon-rgb), 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(var(--neon-rgb), 0.08);
+    background: var(--bg-card-hover);
+}
+
+.msg-card:hover::before { opacity: 1; }
+
+@keyframes cardSlideIn {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.msg-card:nth-child(1)  { animation-delay: 0.00s; }
+.msg-card:nth-child(2)  { animation-delay: 0.04s; }
+.msg-card:nth-child(3)  { animation-delay: 0.08s; }
+.msg-card:nth-child(4)  { animation-delay: 0.12s; }
+.msg-card:nth-child(5)  { animation-delay: 0.16s; }
+.msg-card:nth-child(6)  { animation-delay: 0.20s; }
+.msg-card:nth-child(7)  { animation-delay: 0.24s; }
+.msg-card:nth-child(8)  { animation-delay: 0.28s; }
+
+/* Card Header */
+.msg-header {
+    display: flex; align-items: center;
+    gap: 14px; margin-bottom: 14px;
+}
+
+.avatar-box { position: relative; flex-shrink: 0; }
+
+.avatar {
+    width: 46px; height: 46px;
+    border-radius: 13px;
+    background: #0f172a;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 3px; transition: transform 0.2s;
+}
+.msg-card:hover .avatar { transform: scale(1.05); }
+
+.status-badge {
+    width: 10px; height: 10px;
+    background: var(--success);
+    border: 2px solid var(--bg);
+    border-radius: 50%;
+    position: absolute; bottom: -1px; right: -1px;
+    box-shadow: 0 0 6px rgba(16,185,129,0.5);
+}
+
+.user-info { flex: 1; min-width: 0; }
+
+.user-info h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--neon);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.user-info .timestamp {
+    font-size: 0.7rem; color: var(--text-muted);
+    display: flex; align-items: center; gap: 5px;
+}
+.user-info .timestamp i { font-size: 0.6rem; }
+
+/* NEW label for fresh content */
+.new-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #000;
+    background: var(--neon);
+    padding: 2px 7px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    flex-shrink: 0;
+    animation: badgePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePop {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+/* Message Content — Smooth expand/collapse */
+.msg-content {
+    font-size: 0.875rem;
+    color: #dde4f0;
+    line-height: 1.75;
+    margin-bottom: 14px;
+    overflow: hidden;
+    word-break: break-word;
+    position: relative;
+    /* transition applied via JS after scrollHeight is known */
+}
+
+.msg-content.text-collapsed {
+    max-height: 5.25em;
+    transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Gradient fade at bottom of collapsed content */
+.msg-content.text-collapsed::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 36px;
+    background: linear-gradient(transparent, rgba(10,16,34,0.95));
+    pointer-events: none;
+}
+
+.msg-content.text-expanded {
+    /* max-height set dynamically via JS to actual scrollHeight */
+    transition: max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.msg-content.text-expanded::after { display: none; }
+
+/* Search highlight */
+.msg-content mark {
+    background: rgba(var(--neon-rgb), 0.2);
+    color: var(--neon);
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+/* Read More Button */
+.read-more-btn {
+    display: inline-flex;
+    align-items: center; gap: 6px;
+    color: var(--neon);
+    background: rgba(var(--neon-rgb), 0.06);
+    border: 1px solid rgba(var(--neon-rgb), 0.15);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    cursor: pointer; font-weight: 600;
+    font-size: 0.75rem;
+    margin-bottom: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.02em;
+}
+
+.read-more-btn:hover {
+    background: rgba(var(--neon-rgb), 0.12);
+    border-color: rgba(var(--neon-rgb), 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(var(--neon-rgb), 0.15);
+}
+
+.read-more-btn i {
+    font-size: 0.65rem;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.read-more-btn.expanded i { transform: rotate(180deg); }
+
+/* Card Footer */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    padding-top: 13px; gap: 8px;
+}
+
+.action-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.action-btn {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.775rem;
+    transition: var(--transition);
+    display: inline-flex; align-items: center; gap: 6px;
+    font-weight: 500; white-space: nowrap;
+}
+
+.action-btn:hover {
+    background: rgba(255,255,255,0.07);
+    color: var(--text-primary);
+    border-color: var(--border);
+    transform: translateY(-1px);
+}
+
+.edit-btn:hover {
+    color: var(--neon);
+    border-color: rgba(var(--neon-rgb), 0.2);
+    background: rgba(var(--neon-rgb), 0.06);
+}
+
+/* ============================================================
+   MORE CONTENT SECTION
+   ============================================================ */
+.more-section { margin-top: 28px; }
+
+.more-section-header {
+    display: flex; align-items: center;
+    gap: 14px; margin-bottom: 4px;
+}
+
+.more-divider {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.06), transparent);
+}
+
+.more-toggle-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 20px;
+    background: rgba(10,16,34,0.8);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+.more-toggle-btn:hover {
+    border-color: rgba(var(--neon-rgb), 0.3);
+    color: var(--text-primary);
+    background: rgba(var(--neon-rgb), 0.05);
+}
+.more-toggle-btn.open {
+    background: rgba(var(--neon-rgb), 0.06);
+    border-color: rgba(var(--neon-rgb), 0.3);
+    color: var(--neon);
+}
+.more-toggle-btn i { font-size: 0.7rem; transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+.more-toggle-btn.open i { transform: rotate(180deg); }
+
+.more-grid-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 16px;
+}
+.more-grid-wrapper.open { grid-template-rows: 1fr; }
+.more-grid-inner { overflow: hidden; }
+.more-grid { display: grid; gap: 16px; padding-bottom: 4px; }
+
+/* Infinite scroll sentinel */
+#scroll-sentinel {
+    height: 1px;
+    margin-top: 20px;
+}
+
+/* ============================================================
+   TOAST / NOTIFICATION
+   ============================================================ */
+.toast {
+    position: fixed;
+    bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(10, 18, 40, 0.96);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(var(--neon-rgb), 0.2);
+    color: var(--neon); padding: 12px 22px;
+    border-radius: 12px; font-weight: 600;
+    font-size: 0.8rem; text-align: center;
+    z-index: 99999;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    animation: toastIn 0.3s forwards, toastOut 0.3s 1.8s forwards;
+    white-space: nowrap; pointer-events: none;
+}
+@keyframes toastIn { to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+@keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(10px); } }
+
+/* ============================================================
+   EDIT OVERLAY
+   ============================================================ */
+.edit-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 10000; gap: 16px;
+}
+.edit-overlay p { font-size: 0.8rem; color: var(--text-secondary); animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.main-footer {
+    background: #000; color: var(--text-primary);
+    padding: 56px 5% 28px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.footer-top {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 28px; margin-bottom: 48px;
+}
+.footer-col h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-primary); margin-bottom: 16px;
+}
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: 10px; }
+.footer-col ul li a { color: var(--text-muted); font-size: 0.84rem; transition: color 0.2s; }
+.footer-col ul li a:hover { color: var(--neon); }
+
+.footer-middle { text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 40px; margin-bottom: 36px; }
+.footer-logo-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 2.4rem; font-weight: 900;
+    letter-spacing: -2px; margin-bottom: 28px;
+    display: block;
+    background: linear-gradient(90deg, var(--neon), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.social-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em; color: var(--text-secondary); margin-bottom: 18px; text-transform: uppercase; }
+.social-links { display: flex; justify-content: center; gap: 22px; margin-bottom: 36px; }
+.social-links a { color: var(--text-muted); font-size: 1.3rem; transition: color 0.2s, transform 0.2s; }
+.social-links a:hover { color: var(--neon); transform: translateY(-3px); }
+.app-downloads { display: flex; justify-content: center; gap: 12px; margin-bottom: 44px; flex-wrap: wrap; }
+.app-btn { border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius-sm); padding: 9px 18px; display: flex; align-items: center; gap: 10px; color: var(--text-primary); transition: var(--transition); min-width: 150px; }
+.app-btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.25); transform: translateY(-2px); }
+.app-btn i { font-size: 1.4rem; }
+.app-btn div span { display: block; font-size: 0.6rem; color: var(--text-muted); }
+.app-btn div strong { font-size: 0.875rem; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 28px; text-align: center; }
+.bottom-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+.bottom-links a { color: var(--text-muted); font-size: 0.75rem; transition: color 0.2s; }
+.bottom-links a:hover { color: var(--text-secondary); }
+.copyright-text { font-size: 0.72rem; color: var(--text-muted); line-height: 2; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 600px) {
+    .logo { font-size: 0.88rem; }
+    .msg-card { padding: 16px; border-radius: 16px; }
+    .avatar { width: 40px; height: 40px; }
+    .card-footer { flex-wrap: wrap; gap: 10px; }
+    .action-group { flex: 1; }
+    .footer-logo-text { font-size: 2rem; }
+    .app-downloads { flex-direction: column; align-items: center; }
+    .social-links { gap: 16px; }
+    #update-timer { display: none; }
+    .theme-switcher-label { display: none; }
+}
+
+@media (min-width: 601px) {
+    header { padding: 16px 5%; }
+    .search-box input { font-size: 0.9rem; }
+    .container { padding-top: 132px; }
+}
+
+@media (min-width: 768px) { .container { padding-top: 124px; } }
+
+/* ============================================================
+   DELETE & VERIFY BUTTONS
+   ============================================================ */
+.action-btn.delete-btn:hover {
+    color: var(--danger);
+    border-color: rgba(244,63,94,0.25);
+    background: rgba(244,63,94,0.07);
+}
+.action-btn.verify-btn:hover {
+    color: var(--success);
+    border-color: rgba(16,185,129,0.25);
+    background: rgba(16,185,129,0.07);
+}
+.action-btn.verify-btn.done {
+    color: var(--success);
+    background: rgba(16,185,129,0.1);
+    border-color: rgba(16,185,129,0.3);
+}
+.done-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 0.08em; color: var(--success);
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.25);
+    padding: 2px 8px; border-radius: var(--radius-full);
+    text-transform: uppercase; flex-shrink: 0;
+}
+.msg-card.deleting {
+    animation: cardDelete 0.45s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+    pointer-events: none;
+}
+@keyframes cardDelete {
+    0%   { opacity: 1; transform: scale(1) translateX(0); max-height: 400px; margin-bottom: 16px; }
+    40%  { opacity: 0; transform: scale(0.96) translateX(12px); }
+    100% { opacity: 0; transform: scale(0.94) translateX(12px); max-height: 0; margin-bottom: 0; padding: 0; border-width: 0; }
+}
+
+/* Confirm delete modal */
+.confirm-modal-bg {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 99999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.confirm-modal {
+    background: rgba(10, 16, 34, 0.98);
+    border: 1px solid rgba(244,63,94,0.25);
+    border-radius: 18px; padding: 28px 24px;
+    max-width: 320px; width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes modalIn { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: scale(1); } }
+
+.confirm-modal-icon { font-size: 2rem; color: var(--danger); margin-bottom: 12px; display: block; }
+.confirm-modal h3 { font-size: 1rem; color: var(--text-primary); margin-bottom: 8px; }
+.confirm-modal p { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 22px; line-height: 1.6; }
+.confirm-modal-preview {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 0.75rem; color: var(--text-secondary);
+    margin-bottom: 22px; text-align: left;
+    line-height: 1.6; max-height: 60px;
+    overflow: hidden; position: relative;
+}
+.confirm-modal-preview::after {
+    content: ''; position: absolute;
+    bottom: 0; left: 0; right: 0; height: 24px;
+    background: linear-gradient(transparent, rgba(10,16,34,0.98));
+}
+.confirm-modal-actions { display: flex; gap: 10px; }
+.confirm-modal-actions button {
+    flex: 1; padding: 11px; border-radius: 10px;
+    font-size: 0.82rem; font-weight: 700;
+    transition: var(--transition);
+    border: none; letter-spacing: 0.03em;
+}
+.confirm-cancel { background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--border); }
+.confirm-cancel:hover { background: rgba(255,255,255,0.09); color: var(--text-primary); }
+.confirm-delete { background: var(--danger); color: white; }
+.confirm-delete:hover { background: #e11d48; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(244,63,94,0.35); }
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(var(--neon-rgb), 0.15); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(var(--neon-rgb), 0.3); }
+
+/* Badge group in card header */
+.badge-group {
+    display: flex; gap: 5px;
+    align-items: center; flex-shrink: 0;
+}
+
+/* Right-side action buttons in card footer */
+.card-right-actions {
+    display: flex; gap: 8px; align-items: center;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header>
+    <div class="header-top">
+        <div class="logo">⚡ SIRI ADMIN PANEL</div>
+        <div class="header-right">
+            <div id="update-timer">5:00</div>
+            <!-- Theme Switcher -->
+            <div class="theme-switcher" title="Badilisha Mada">
+                <span class="theme-switcher-label">Mada</span>
+                <button class="theme-dot t-neon active" id="td-neon"    onclick="setTheme('neon')"    title="Neon Blue"></button>
+                <button class="theme-dot t-gold"        id="td-gold"    onclick="setTheme('gold')"    title="Cyber Gold"></button>
+                <button class="theme-dot t-crimson"     id="td-crimson" onclick="setTheme('crimson')" title="Crimson Red"></button>
+                <button class="theme-dot t-matrix"      id="td-matrix"  onclick="setTheme('matrix')"  title="Matrix Green"></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-wrapper">
+        <div class="search-box">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Tafuta siri yoyote..."
+                autocomplete="off"
+                spellcheck="false"
+                oninput="handleSearch(this.value)"
+            >
+            <i class="fas fa-search search-icon"></i>
+            <span class="search-ai-badge"><i class="fas fa-bolt"></i> AI Search</span>
+            <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Futa utafutaji" aria-label="Futa">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="search-results-info"></div>
+    </div>
+</header>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="container" role="main">
+
+    <div id="loader" class="loader-wrapper">
+        <div class="spinner"></div>
+        <p class="loader-text">Inapakia siri mpya... tafadhali subiri sekunde chache.</p>
+    </div>
+
+    <div id="error-state" class="error-state">
+        <i class="fas fa-wifi-slash"></i>
+        <p>Imeshindwa kupakia data. Angalia muunganiko wako wa mtandao.</p>
+        <button class="retry-btn" onclick="loadData()">
+            <i class="fas fa-redo"></i> Jaribu tena
+        </button>
+    </div>
+
+    <div id="empty-state" class="empty-state">
+        <i class="fas fa-search-minus"></i>
+        <h3>Hakuna matokeo</h3>
+        <p>Hakuna siri zinazoendana na "<span id="empty-query"></span>". Jaribu maneno mengine.</p>
+    </div>
+
+    <div id="message-grid" class="message-grid" role="feed" aria-label="Siri za hivi karibuni"></div>
+
+    <div id="more-section" class="more-section" style="display:none">
+        <div class="more-section-header">
+            <div class="more-divider"></div>
+            <button id="more-toggle" class="more-toggle-btn" onclick="toggleMoreContent()" aria-expanded="false">
+                <i class="fas fa-layer-group"></i>
+                <span>Siri za Zamani</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="more-divider" style="background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06))"></div>
+        </div>
+        <div class="more-grid-wrapper" id="more-wrapper">
+            <div class="more-grid-inner">
+                <div id="more-grid" class="more-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Infinite scroll sentinel -->
+    <div id="scroll-sentinel"></div>
+
+</main>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="main-footer" role="contentinfo">
+    <div class="footer-top">
+        <div class="footer-col">
+            <h3>Siri Features</h3>
+            <ul>
+                <li><a href="#">Siri za Leo</a></li>
+                <li><a href="#">Zinazotandwa</a></li>
+                <li><a href="#">Mshauri wa Mapenzi</a></li>
+                <li><a href="#">Ushuhuda</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h3>Gundua Zaidi</h3>
+            <ul>
+                <li><a href="#">Tazama Hadithi</a></li>
+                <li><a href="#">Sikiliza Audio</a></li>
+                <li><a href="#">Michezo</a></li>
+                <li><a href="#">Kura za Maoni</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h3>Kuhusu Siri</h3>
+            <ul>
+                <li><a href="#">Siri Board ni nini?</a></li>
+                <li><a href="#">Usalama wako</a></li>
+                <li><a href="#">Ajira</a></li>
+                <li><a href="#">Wasiliana Nasi</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer-middle">
+        <span class="footer-logo-text">SIRI</span>
+        <p class="social-title">Fuata Siri Board</p>
+        <div class="social-links">
+            <a href="https://facebook.com/siri" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook"></i></a>
+            <a href="https://x.com/siri" target="_blank" rel="noopener" title="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
+            <a href="https://instagram.com/siri" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://tiktok.com/@siri" target="_blank" rel="noopener" title="TikTok"><i class="fab fa-tiktok"></i></a>
+            <a href="https://youtube.com/@siri" target="_blank" rel="noopener" title="YouTube"><i class="fab fa-youtube"></i></a>
+            <a href="https://threads.net/@siri" target="_blank" rel="noopener" title="Threads"><i class="fab fa-threads"></i></a>
+        </div>
+        <div class="app-downloads">
+            <a href="#" class="app-btn"><i class="fab fa-apple"></i><div><span>Pakua kwenye</span><strong>App Store</strong></div></a>
+            <a href="#" class="app-btn"><i class="fab fa-google-play"></i><div><span>Pata kwenye</span><strong>Google Play</strong></div></a>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="bottom-links">
+            <a href="#">Masharti ya Matumizi</a>
+            <a href="#">Sera ya Faragha</a>
+            <a href="#">Vidakuzi</a>
+            <a href="#">Matangazo</a>
+            <a href="#">Upatikanaji</a>
+            <a href="#">Kuhusu</a>
+            <a href="#">Jarida</a>
+        </div>
+        <div class="copyright-text">
+            &copy; 2026 Siri Board Network. Kampuni ya Mnyilinga. Haki zote zimehifadhiwa.<br>
+            Siri Board &trade; &amp; &copy; 2026 Mnyilinga Digital.
+        </div>
+    </div>
+</footer>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script>
+'use strict';
+
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbw1HZ2um7cIWhcGo5xZ_mzBLuxCFKm7SVN_adRMf9wiJZa4vCawWcoueXM7BkLf_3t8zg/exec";
+const LATEST_LIMIT = 30;
+const REFRESH_SEC  = 300; // 5 minutes
+const INFINITE_BATCH = 10; // how many to append each time
+
+/* ============================================================
+   EXPANDED FAKE PERSONAS — 50 diverse names
+   ============================================================ */
+const PERSONAS = [
+    "Mshauri wa Mapenzi",    "Fatuma wa Dar",         "Binti wa Arusha",
+    "Kijana wa Daslaam",     "Mama Ntilie",            "Daktari Siri",
+    "The Silent Watcher",    "Queen of Hearts",        "Mzee wa Kazi",
+    "Lady Boss 254",         "Mtafuta Riziki",         "Mnyamwezi",
+    "Fundi Mitambo",         "Mzalendo Halisi",        "Mtumiaji Siri",
+    "Anonymous 007",         "Kaka Mkuu",              "Dada Purity",
+    "Mwenyekiti",            "Siri ya Chumbani",       "Zawadi wa Pemba",
+    "Amina Salim",           "Baraka wa Morogoro",     "Cynthia T.",
+    "David wa Tanga",        "Esther Kisumu",          "Farida Online",
+    "Grace Unlimited",       "Hassan wa Zanzibar",     "Irene Secret",
+    "Jamila wa Dodoma",      "Kelvin Msisitizo",       "Linda wa Mombasa",
+    "Mustafa Msomi",         "Neema Anonymous",        "Omar wa Lindi",
+    "Penelope Siri",         "Queen Rahel",            "Rashid wa Tabora",
+    "Salma Msichana",        "Tumaini wa Songea",      "Uchungu wa Moyo",
+    "Veronica wa Iringa",    "Wambua Mkubwa",          "Xena wa Shinyanga",
+    "Yasmin Siri",           "Zuberi wa Mtwara",       "Alpha Female TZ",
+    "Beta Msomi",            "Gamma wa Pwani",
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let allMessages    = [];
+let timeLeft       = REFRESH_SEC;
+let expandedCount  = 0;
+let pendingRefresh = false;
+let searchTimer    = null;
+let lastQuery      = '';
+let infinitePage   = 0;  // for infinite scroll loop
+
+
+
+
+
+
+
+/* ============================================================
+   THEME SWITCHER
+   ============================================================ */
+function setTheme(name) {
+    const html = document.documentElement;
+    html.removeAttribute('data-theme');
+    if (name !== 'neon') html.setAttribute('data-theme', name);
+
+    // Update active dot
+    ['neon','gold','crimson','matrix'].forEach(t => {
+        const dot = document.getElementById('td-' + t);
+        if (dot) dot.classList.toggle('active', t === name);
+    });
+
+    // Save preference
+    try { localStorage.setItem('siri-theme', name); } catch(e) {}
+}
+
+// Restore saved theme on load
+(function() {
+    try {
+        const saved = localStorage.getItem('siri-theme');
+        if (saved && saved !== 'neon') setTheme(saved);
+    } catch(e) {}
+})();
+
+/* ============================================================
+   TIMESTAMP FORMATTER
+   — Minutes/Hours for under 24hrs → Date "1 Apr 2026" after 24hrs
+   ============================================================ */
+const MONTH_NAMES_SW = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ago','Sep','Okt','Nov','Des'];
+
+function parseDate(rawTime) {
+    if (!rawTime) return null;
+    let date = new Date(rawTime);
+    if (isNaN(date.getTime())) {
+        const m = String(rawTime).match(
+            /^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})[,\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?/
+        );
+        if (m) date = new Date(parseInt(m[3]), parseInt(m[2])-1, parseInt(m[1]), parseInt(m[4]), parseInt(m[5]), parseInt(m[6]||0));
+    }
+    if (isNaN(date.getTime())) {
+        const m = String(rawTime).match(/^(\d{1,2})[\/](\d{1,2})[\/](\d{4})/);
+        if (m) date = new Date(parseInt(m[3]), parseInt(m[1])-1, parseInt(m[2]));
+    }
+    return isNaN(date.getTime()) ? null : date;
+}
+
+function formatTime(rawTime) {
+    const date = parseDate(rawTime);
+    if (!date) return String(rawTime || '');
+
+    const now  = new Date();
+    const diff = now - date;
+    if (diff < 0) return 'Karibuni';
+
+    const mins  = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+
+    if (mins < 1)  return 'Sasa hivi';
+    if (mins < 60) return mins === 1 ? 'Dakika 1 iliyopita' : `Dakika ${mins} zilizopita`;
+    if (hours < 24) return hours === 1 ? 'Saa 1 iliyopita' : `Masaa ${hours} yaliyopita`;
+
+    const d  = date.getDate();
+    const mo = MONTH_NAMES_SW[date.getMonth()];
+    const yr = date.getFullYear();
+    return `${d} ${mo} ${yr}`;
+}
+
+function isRecent(rawTime) {
+    const date = parseDate(rawTime);
+    return date ? (Date.now() - date) < 60 * 60 * 1000 : false;
+}
+
+/* ============================================================
+   AI-LIKE FUZZY SEARCH ENGINE
+   ============================================================ */
+function normalize(str) {
+    return str.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function levenshtein(a, b) {
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    const maxDist = Math.max(a.length, b.length);
+    if (maxDist > 20) return maxDist;
+    const dp = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+        let prev = dp[0]; dp[0] = i;
+        for (let j = 1; j <= b.length; j++) {
+            const temp = dp[j];
+            dp[j] = a[i-1] === b[j-1] ? prev : 1 + Math.min(prev, dp[j], dp[j-1]);
+            prev = temp;
+        }
+    }
+    return dp[b.length];
+}
+
+function fuzzyScore(text, query) {
+    if (!query) return 1;
+    const nText = normalize(text), nQuery = normalize(query);
+    if (!nQuery) return 1;
+    if (nText.includes(nQuery)) return 100;
+
+    const qWords = nQuery.split(' ').filter(w => w.length > 1);
+    if (!qWords.length) return 0;
+    const tWords = nText.split(' ').filter(w => w.length > 1);
+
+    let wordMatchCount = 0, fuzzyMatchCount = 0;
+    for (const qw of qWords) {
+        if (tWords.some(tw => tw === qw)) { wordMatchCount += 2; continue; }
+        if (tWords.some(tw => tw.startsWith(qw) || qw.startsWith(tw))) { wordMatchCount += 1.5; continue; }
+        if (tWords.some(tw => tw.includes(qw) || qw.includes(tw))) { wordMatchCount += 1; continue; }
+        if (qw.length >= 3) {
+            const tol = qw.length <= 4 ? 1 : qw.length <= 7 ? 2 : 3;
+            if (tWords.some(tw => tw.length >= 3 && levenshtein(qw, tw) <= tol)) fuzzyMatchCount += 0.6;
+        }
+    }
+    const total = wordMatchCount + fuzzyMatchCount;
+    if (total / (qWords.length * 2) < 0.25) return 0;
+    return total;
+}
+
+function highlightMatches(text, query) {
+    if (!query || !query.trim()) return text;
+    const qWords = normalize(query).split(' ').filter(w => w.length > 1);
+    if (!qWords.length) return text;
+    const pattern = qWords.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+    try { return text.replace(new RegExp(`(${pattern})`, 'gi'), '<mark>$1</mark>'); }
+    catch { return text; }
+}
+
+/* ============================================================
+   ESCAPE HELPERS
+   ============================================================ */
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function escapeAttr(str) {
+    return String(str).replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+/* ============================================================
+   RENDER CARD
+   — No Like button
+   — "Mpya" badge for fresh posts only, independent of Verify
+   ============================================================ */
+function createCard(msg, index, highlightQuery) {
+    const persona = PERSONAS[index % PERSONAS.length];
+    const avatar  = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(persona)}`;
+    const isLong  = msg.text && msg.text.length > 200;
+    const time    = formatTime(msg.time);
+    const fresh   = isRecent(msg.time);
+    const isDone  = msg.status === 'done';
+
+    const displayText = highlightQuery
+        ? highlightMatches(escapeHtml(msg.text || ''), highlightQuery)
+        : escapeHtml(msg.text || '');
+
+    const card = document.createElement('div');
+    card.className = 'msg-card';
+    card.dataset.msgId = msg.id;
+
+    card.innerHTML = `
+        <div class="msg-header">
+            <div class="avatar-box">
+                <img src="${avatar}" class="avatar" alt="Avatar ya ${escapeAttr(persona)}" loading="lazy" width="46" height="46">
+                <div class="status-badge" title="Mtumiaji anayeishi"></div>
+            </div>
+            <div class="user-info">
+                <h4>${escapeHtml(persona)}</h4>
+                <span class="timestamp">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    <span>${time}</span>
+                </span>
+            </div>
+            <div class="badge-group">
+                ${fresh ? '<span class="new-badge">Mpya</span>' : ''}
+                ${isDone ? '<span class="done-badge"><i class="fas fa-check-circle"></i> Done</span>' : ''}
+            </div>
+        </div>
+
+        <div class="msg-content ${isLong ? 'text-collapsed' : 'text-expanded'}" id="content-${msg.id}" role="article">
+            ${displayText}
+        </div>
+
+        ${isLong ? `
+        <button class="read-more-btn" onclick="toggleReadMore('${msg.id}', this)" aria-expanded="false">
+            <span>Soma Zaidi</span>
+            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+        </button>` : ''}
+
+        <div class="card-footer">
+            <div class="action-group">
+                <button class="action-btn" onclick="copyText('${msg.id}', this)" aria-label="Nakili ujumbe huu">
+                    <i class="far fa-copy" aria-hidden="true"></i> Nakili
+                </button>
+                <button class="action-btn verify-btn ${isDone ? 'done' : ''}" 
+                    onclick="toggleVerify('${msg.id}', this)" 
+                    aria-label="${isDone ? 'Imeshughulikiwa' : 'Weka kama imeshughulikiwa'}"
+                    title="${isDone ? 'Imeshughulikiwa tayari' : 'Weka kama Done/Posted'}">
+                    <i class="fas ${isDone ? 'fa-check-circle' : 'fa-circle-check'}" aria-hidden="true"></i>
+                    ${isDone ? 'Done' : 'Verify'}
+                </button>
+            </div>
+            <div class="card-right-actions">
+                <button class="action-btn edit-btn" onclick="shareWa('${msg.id}')" aria-label="Hariri ujumbe huu">
+                    <i class="fas fa-pen-to-square" aria-hidden="true"></i> Hariri
+                </button>
+                <button class="action-btn delete-btn" onclick="confirmDelete('${msg.id}', this)" aria-label="Futa ujumbe huu">
+                    <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    `;
+
+    return card;
+}
+
+/* ============================================================
+   RENDER UI
+   ============================================================ */
+function renderUI(data, query) {
+    const grid        = document.getElementById('message-grid');
+    const moreGrid    = document.getElementById('more-grid');
+    const moreSection = document.getElementById('more-section');
+    const emptyState  = document.getElementById('empty-state');
+    const emptyQuery  = document.getElementById('empty-query');
+
+    grid.innerHTML     = '';
+    moreGrid.innerHTML = '';
+    infinitePage = 0;
+    expandedCount  = 0;   // reset so auto-refresh isn't blocked after re-render
+    pendingRefresh = false;
+
+    if (data.length === 0) {
+        emptyState.style.display = 'block';
+        if (emptyQuery) emptyQuery.textContent = query || '';
+        moreSection.style.display = 'none';
+        return;
+    }
+
+    emptyState.style.display = 'none';
+
+    const latest = data.slice(0, LATEST_LIMIT);
+    const older  = data.slice(LATEST_LIMIT);
+
+    latest.forEach((msg, i) => grid.appendChild(createCard(msg, i, query)));
+
+    if (older.length > 0) {
+        moreSection.style.display = 'block';
+        older.forEach((msg, i) => moreGrid.appendChild(createCard(msg, LATEST_LIMIT + i, query)));
+        const toggleBtn = document.getElementById('more-toggle');
+        const spans = toggleBtn.querySelectorAll('span');
+        if (spans[0]) spans[0].textContent = `Siri za Zamani (${older.length})`;
+    } else {
+        moreSection.style.display = 'none';
+    }
+}
+
+/* ============================================================
+   INFINITE SCROLL — Loop posts when bottom reached
+   ============================================================ */
+const sentinel = document.getElementById('scroll-sentinel');
+
+const infiniteObserver = new IntersectionObserver((entries) => {
+    if (!entries[0].isIntersecting) return;
+    if (!allMessages.length || lastQuery) return; // don't loop during search
+
+    infinitePage++;
+    const startIdx = (infinitePage * INFINITE_BATCH) % allMessages.length;
+    const batch = [];
+
+    for (let i = 0; i < INFINITE_BATCH; i++) {
+        batch.push(allMessages[(startIdx + i) % allMessages.length]);
+    }
+
+    const grid = document.getElementById('message-grid');
+    const currentCount = grid.querySelectorAll('.msg-card').length;
+
+    batch.forEach((msg, i) => {
+        const card = createCard(msg, currentCount + i, '');
+        // Prevent duplicate IDs: prefix infinite-loaded elements
+        card.dataset.msgId = `inf-${infinitePage}-${msg.id}`;
+        card.querySelectorAll('[id]').forEach(el => {
+            if (el.id.startsWith('content-')) el.id = `content-inf-${infinitePage}-${msg.id}`;
+        });
+        card.style.animationDelay = `${i * 0.04}s`;
+        grid.appendChild(card);
+    });
+
+}, { rootMargin: '200px' });
+
+infiniteObserver.observe(sentinel);
+
+/* ============================================================
+   FETCH DATA
+   ============================================================ */
+async function loadData() {
+    const loader     = document.getElementById('loader');
+    const errorState = document.getElementById('error-state');
+    const timer      = document.getElementById('update-timer');
+
+    errorState.style.display = 'none';
+    timer.classList.add('refreshing');
+
+    if (!allMessages.length) loader.style.display = 'flex';
+
+    try {
+        const res  = await fetch(SCRIPT_URL + '?t=' + Date.now());
+        const data = await res.json();
+
+        allMessages = [...data].reverse();
+        loader.style.display = 'none';
+
+        if (lastQuery) performSearch(lastQuery);
+        else renderUI(allMessages, '');
+
+    } catch (err) {
+        loader.style.display = 'none';
+        if (!allMessages.length) errorState.style.display = 'block';
+        console.error('[SiriBoard]', err);
+    } finally {
+        timer.classList.remove('refreshing');
+    }
+}
+
+/* ============================================================
+   READ MORE TOGGLE — Smooth animation, DOM-relative (no ID lookup)
+   ============================================================ */
+function toggleReadMore(id, btn) {
+    // Traverse from button — works even for infinite-scroll duplicate IDs
+    const card    = btn.closest('.msg-card');
+    const content = card ? card.querySelector('.msg-content') : document.getElementById(`content-${id}`);
+
+    if (!content) return; // safety guard
+
+    const isCollapsed = content.classList.contains('text-collapsed');
+
+    if (isCollapsed) {
+        // EXPAND: measure real height then animate to it
+        content.classList.remove('text-collapsed');
+        content.classList.add('text-expanded');
+
+        // Set to actual scrollHeight so animation works for ANY length
+        const fullHeight = content.scrollHeight;
+        content.style.maxHeight = fullHeight + 'px';
+
+        // After transition completes, remove max-height so content can reflow freely
+        content.addEventListener('transitionend', function onEnd() {
+            content.removeEventListener('transitionend', onEnd);
+            if (content.classList.contains('text-expanded')) {
+                content.style.maxHeight = 'none';
+            }
+        }, { once: true });
+
+        btn.classList.add('expanded');
+        btn.setAttribute('aria-expanded', 'true');
+        const span = btn.querySelector('span');
+        if (span) span.textContent = 'Onyesha Kidogo';
+        expandedCount++;
+
+    } else {
+        // COLLAPSE: first pin max-height to current value so CSS transition fires
+        content.style.maxHeight = content.scrollHeight + 'px';
+
+        // Force reflow so browser registers the starting value
+        content.offsetHeight; // eslint-disable-line no-unused-expressions
+
+        content.classList.add('text-collapsed');
+        content.classList.remove('text-expanded');
+        // CSS .text-collapsed sets max-height: 5.25em — transition will animate
+        content.style.maxHeight = ''; // let CSS class handle it
+
+        btn.classList.remove('expanded');
+        btn.setAttribute('aria-expanded', 'false');
+        const span = btn.querySelector('span');
+        if (span) span.textContent = 'Soma Zaidi';
+        expandedCount = Math.max(0, expandedCount - 1);
+
+        // Scroll card top into view if it's above viewport after collapsing
+        if (card) {
+            const rect = card.getBoundingClientRect();
+            if (rect.top < 80) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        if (expandedCount === 0 && pendingRefresh) {
+            pendingRefresh = false;
+            timeLeft = REFRESH_SEC;
+            loadData();
+        }
+    }
+}
+
+/* ============================================================
+   MORE CONTENT TOGGLE
+   ============================================================ */
+function toggleMoreContent() {
+    const wrapper   = document.getElementById('more-wrapper');
+    const toggleBtn = document.getElementById('more-toggle');
+    const isOpen    = wrapper.classList.contains('open');
+
+    if (isOpen) {
+        wrapper.classList.remove('open');
+        toggleBtn.classList.remove('open');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+    } else {
+        wrapper.classList.add('open');
+        toggleBtn.classList.add('open');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+    }
+}
+
+/* ============================================================
+   AI SEARCH — Debounced
+   ============================================================ */
+function handleSearch(value) {
+    const clearBtn = document.getElementById('searchClear');
+    const infoEl   = document.getElementById('search-results-info');
+    clearBtn.classList.toggle('visible', value.length > 0);
+    lastQuery = value;
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => performSearch(value), 320);
+}
+
+function performSearch(query) {
+    const infoEl = document.getElementById('search-results-info');
+    if (!query || !query.trim()) {
+        renderUI(allMessages, '');
+        infoEl.classList.remove('visible');
+        return;
+    }
+    const scored = allMessages
+        .map(msg => ({ msg, score: fuzzyScore(msg.text || '', query) }))
+        .filter(x => x.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map(x => x.msg);
+
+    renderUI(scored, query.trim());
+    infoEl.innerHTML = scored.length > 0
+        ? `Matokeo <strong>${scored.length}</strong> kwa "<strong>${escapeHtml(query.trim())}</strong>"`
+        : '';
+    infoEl.classList.toggle('visible', scored.length > 0);
+}
+
+function clearSearch() {
+    const input    = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('searchClear');
+    const infoEl   = document.getElementById('search-results-info');
+    input.value = '';
+    lastQuery   = '';
+    clearTimeout(searchTimer);
+    clearBtn.classList.remove('visible');
+    infoEl.classList.remove('visible');
+    renderUI(allMessages, '');
+    input.focus();
+}
+
+/* ============================================================
+   COPY
+   ============================================================ */
+function copyText(id, btn) {
+    // Primary: traverse from button (works for infinite-scroll duplicates)
+    const card = btn ? btn.closest('.msg-card') : null;
+    const el   = card
+        ? card.querySelector('.msg-content')
+        : document.getElementById(`content-${id}`);
+
+    if (!el) { showToast('⚠️ Haikuweza kupata ujumbe'); return; }
+
+    // Get plain text — clone and remove any <mark> highlight tags
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll('mark').forEach(m => {
+        m.replaceWith(document.createTextNode(m.textContent));
+    });
+    const text = (clone.innerText || clone.textContent || '').trim();
+
+    navigator.clipboard.writeText(text)
+        .then(() => showToast('✅ Ujumbe umenakiliwa!'))
+        .catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); showToast('✅ Ujumbe umenakiliwa!'); }
+            catch { showToast('⚠️ Haikuweza kunakili'); }
+            ta.remove();
+        });
+}
+
+/* ============================================================
+   EDIT / SHARE — Instant redirect
+   ============================================================ */
+function shareWa(id) {
+    const overlay = document.createElement('div');
+    overlay.className = 'edit-overlay';
+    overlay.innerHTML = `<div class="spinner"></div><p>Inaelekeza kwenye mhariri...</p>`;
+    document.body.appendChild(overlay);
+    // Redirect immediately — overlay shows briefly during navigation
+    window.location.href = 'https://mnyilinga.co.tz/siri/editor';
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(message) {
+    document.querySelectorAll('.toast').forEach(t => t.remove());
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2200);
+}
+
+/* ============================================================
+   DELETE — Confirm Modal
+   ============================================================ */
+function confirmDelete(id, btn) {
+    const card    = btn.closest('.msg-card');
+    const content = document.getElementById(`content-${id}`);
+    const preview = content ? (content.innerText || content.textContent || '').trim().slice(0, 80) : '';
+
+    const modalBg = document.createElement('div');
+    modalBg.className = 'confirm-modal-bg';
+    modalBg.setAttribute('role', 'dialog');
+    modalBg.setAttribute('aria-modal', 'true');
+    modalBg.setAttribute('aria-label', 'Thibitisha kufuta');
+
+    modalBg.innerHTML = `
+        <div class="confirm-modal">
+            <i class="fas fa-trash-alt confirm-modal-icon"></i>
+            <h3>Futa Siri Hii?</h3>
+            <p>Kitendo hiki hakiwezi kurudishwa. Siri itafutwa kabisa kwenye hifadhidata.</p>
+            ${preview ? `<div class="confirm-modal-preview">${escapeHtml(preview)}...</div>` : ''}
+            <div class="confirm-modal-actions">
+                <button class="confirm-cancel" onclick="this.closest('.confirm-modal-bg').remove()">
+                    <i class="fas fa-times"></i> Ghairi
+                </button>
+                <button class="confirm-delete" onclick="executeDelete('${escapeAttr(id)}', this)">
+                    <i class="fas fa-trash-alt"></i> Futa
+                </button>
+            </div>
+        </div>
+    `;
+
+    modalBg.addEventListener('click', e => { if (e.target === modalBg) modalBg.remove(); });
+    document.body.appendChild(modalBg);
+}
+
+async function executeDelete(id, btn) {
+    btn.disabled  = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inafuta...';
+
+    try {
+        const res  = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=delete&id=${encodeURIComponent(id)}`
+        });
+        const data = await res.json();
+        const modal = btn.closest('.confirm-modal-bg');
+        if (modal) modal.remove();
+
+        if (data.result === 'success') {
+            const card = document.querySelector(`.msg-card[data-msg-id="${id}"]`);
+            if (card) {
+                card.classList.add('deleting');
+                setTimeout(() => {
+                    card.remove();
+                    allMessages = allMessages.filter(m => String(m.id) !== String(id));
+                    showToast('🗑️ Siri imefutwa kikamilifu');
+                }, 460);
+            }
+        } else {
+            showToast('❌ Imeshindwa kufuta. Jaribu tena.');
+        }
+    } catch (err) {
+        const modal = btn.closest('.confirm-modal-bg');
+        if (modal) modal.remove();
+        showToast('🌐 Hitilafu ya mtandao wakati wa kufuta.');
+        console.error('[Delete]', err);
+    }
+}
+
+/* ============================================================
+   VERIFY / MARK AS DONE
+   — "Mpya" badge stays untouched; Done badge appears separately
+   ============================================================ */
+async function toggleVerify(id, btn) {
+    const card      = btn.closest('.msg-card');
+    const isDone    = btn.classList.contains('done');
+    const newStatus = isDone ? '' : 'done';
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    try {
+        const res  = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=verify&id=${encodeURIComponent(id)}&status=${encodeURIComponent(newStatus)}`
+        });
+        const data = await res.json();
+
+        if (data.result === 'success') {
+            const msgIndex = allMessages.findIndex(m => String(m.id) === String(id));
+            if (msgIndex !== -1) allMessages[msgIndex].status = newStatus;
+
+            // Find the badge container (next to new-badge, separate)
+            const badgeContainer = card.querySelector('.msg-header > div:last-child');
+
+            if (newStatus === 'done') {
+                btn.classList.add('done');
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Done';
+                btn.title = 'Imeshughulikiwa tayari';
+
+                // Add Done badge without touching the Mpya badge
+                if (badgeContainer && !badgeContainer.querySelector('.done-badge')) {
+                    const doneBadge = document.createElement('span');
+                    doneBadge.className = 'done-badge';
+                    doneBadge.innerHTML = '<i class="fas fa-check-circle"></i> Done';
+                    badgeContainer.appendChild(doneBadge);
+                }
+                showToast('✅ Imewekwa kama Done!');
+            } else {
+                btn.classList.remove('done');
+                btn.innerHTML = '<i class="fas fa-circle-check"></i> Verify';
+                btn.title = 'Weka kama Done/Posted';
+                const doneBadge = card.querySelector('.done-badge');
+                if (doneBadge) doneBadge.remove();
+                showToast('↩️ Status imeondolewa');
+            }
+        } else {
+            showToast('❌ Imeshindwa kubadilisha status.');
+        }
+    } catch (err) {
+        showToast('🌐 Hitilafu ya mtandao.');
+        console.error('[Verify]', err);
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+/* ============================================================
+   AUTO-REFRESH TIMER
+   ============================================================ */
+setInterval(() => {
+    if (timeLeft > 0) timeLeft--;
+
+    if (timeLeft <= 0) {
+        if (expandedCount === 0) {
+            timeLeft = REFRESH_SEC;
+            pendingRefresh = false;
+            loadData();
+        } else {
+            pendingRefresh = true;
+        }
+    }
+
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    const el   = document.getElementById('update-timer');
+    if (el) el.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}, 1000);
+
+/* ============================================================
+   BASIC FRONT-END PROTECTION
+   ============================================================ */
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('selectstart', e => e.preventDefault());
+document.addEventListener('dragstart',   e => e.preventDefault());
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modal = document.querySelector('.confirm-modal-bg');
+        if (modal) { modal.remove(); return; }
+        const overlay = document.querySelector('.edit-overlay');
+        if (overlay) { overlay.remove(); return; }
+    }
+    if (e.key === 'F12') { e.preventDefault(); return; }
+    if (e.ctrlKey && e.shiftKey && ['i','j','c','k'].includes(e.key.toLowerCase())) { e.preventDefault(); return; }
+    if (e.ctrlKey && e.key.toLowerCase() === 'u') { e.preventDefault(); return; }
+    if (e.ctrlKey && e.key.toLowerCase() === 's') { e.preventDefault(); return; }
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+loadData();
+</script>
+
+</body>
+</html>
