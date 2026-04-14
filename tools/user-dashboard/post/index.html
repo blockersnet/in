@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="https://news.mnyilinga.co.tz/premium-icon-01.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <style>
       /* ================================================
          RESET & ROOT
@@ -40,7 +40,7 @@
         --warn:          #f59e0b;
         --warn-bg:       rgba(245,158,11,0.12);
         --link:          #60a5fa;
-        --font-display:  "Syne", system-ui, sans-serif;
+        --font-display:  "Inter", system-ui, sans-serif;
         --font-ui:       "Inter", system-ui, sans-serif;
         --tr:            0.18s ease;
       }
@@ -98,6 +98,28 @@
       }
       .topbar-spacer { flex: 1; }
       .topbar-actions { display: flex; align-items: center; gap: 10px; }
+      .topbar-restart-btn {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border: 1px solid var(--red-light);
+        background: var(--red-bg);
+        color: var(--red);
+        font-size: 11px;
+        font-family: var(--font-ui);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background var(--tr), border-color var(--tr), color var(--tr);
+      }
+      .topbar-restart-btn:hover {
+        background: var(--red);
+        border-color: var(--red);
+        color: #fff;
+      }
+      .topbar-restart-btn svg { flex-shrink: 0; }
       .topbar-time {
         font-size: 12px;
         font-family: var(--font-display);
@@ -685,64 +707,62 @@
         min-height: 320px;
         max-height: 700px;
         overflow-y: auto;
-        padding: 18px 20px;
+        padding: 24px 28px;
         outline: none;
         font-size: 15px;
         line-height: 1.9;
-        color: var(--text);
+        color: #1a1a1a;
         font-family: var(--font-ui);
-        background: var(--surface2);
+        background: #ffffff;
+        border-radius: 0;
       }
       .editor-body:empty::before {
         content: attr(data-placeholder);
-        color: var(--text-faint);
+        color: #aab0bb;
         font-style: italic;
         pointer-events: none;
         font-size: 14px;
       }
       .editor-body h1 {
-        font-family: var(--font-display);
         font-size: 22px; font-weight: 700;
         margin: 14px 0 6px;
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid #e5e7eb;
         padding-bottom: 4px;
-        color: var(--text);
+        color: #111111;
       }
       .editor-body h2 {
-        font-family: var(--font-display);
         font-size: 18px; font-weight: 700;
         margin: 12px 0 4px;
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid #e5e7eb;
         padding-bottom: 3px;
-        color: var(--text);
+        color: #111111;
       }
       .editor-body h3 {
-        font-family: var(--font-display);
         font-size: 15px; font-weight: 700;
         margin: 10px 0 4px;
-        color: var(--text);
+        color: #111111;
       }
-      .editor-body p { margin: 6px 0; }
-      .editor-body a { color: var(--link); text-decoration: underline; }
+      .editor-body p { margin: 6px 0; color: #1a1a1a; }
+      .editor-body a { color: #2563eb; text-decoration: underline; }
       .editor-body blockquote {
         border-left: 3px solid var(--yellow);
         padding: 6px 16px;
-        color: var(--text-muted);
+        color: #555;
         margin: 12px 0;
-        background: var(--yellow-glow);
+        background: #fffbf0;
         font-style: italic;
       }
-      .editor-body ul, .editor-body ol { padding-left: 24px; margin: 6px 0; }
+      .editor-body ul, .editor-body ol { padding-left: 24px; margin: 6px 0; color: #1a1a1a; }
       .editor-body li { margin: 3px 0; }
       .editor-body hr {
         border: none;
-        border-top: 1px solid var(--border);
+        border-top: 1px solid #e5e7eb;
         margin: 16px 0;
       }
       .editor-body figure { margin: 14px 0; }
       .editor-body figcaption {
         font-size: 12px;
-        color: var(--text-faint);
+        color: #888;
         text-align: center;
         margin-top: 6px;
         font-style: italic;
@@ -1423,6 +1443,432 @@
         #toast-stack { bottom: auto; top: 60px; right: 12px; left: 12px; }
         .toast { max-width: 100%; }
       }
+      /* ================================================
+         EDIT POSTS SYSTEM
+      ================================================ */
+      #edit-posts-view {
+        min-height: calc(100svh - 100px);
+        background: var(--surface);
+      }
+
+      /* --- Top bar --- */
+      .ep-topbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border-light);
+        background: var(--surface2);
+        flex-wrap: wrap;
+      }
+      .ep-topbar-left { display: flex; align-items: center; gap: 10px; }
+      .ep-count-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-display);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--yellow);
+        background: var(--yellow-glow);
+        border: 1px solid rgba(253,185,19,0.3);
+        padding: 5px 12px;
+        white-space: nowrap;
+      }
+      .ep-count-badge svg { flex-shrink: 0; stroke: var(--yellow); }
+      .ep-search-wrap {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface3);
+        border: 1px solid var(--border-bright);
+        padding: 6px 12px;
+        min-width: 180px;
+        transition: border-color var(--tr);
+      }
+      .ep-search-wrap:focus-within { border-color: var(--yellow); }
+      .ep-search-wrap svg { flex-shrink: 0; opacity: 0.5; }
+      #ep-search {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 13px;
+        font-family: var(--font-ui);
+        color: var(--text);
+        min-width: 80px;
+      }
+      #ep-search::placeholder { color: var(--text-faint); }
+      .ep-search-clear {
+        background: none; border: none;
+        cursor: pointer; color: var(--text-faint);
+        display: flex; align-items: center;
+        padding: 2px; transition: color var(--tr);
+      }
+      .ep-search-clear:hover { color: var(--red); }
+      .ep-refresh-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border: 1px solid var(--border-bright);
+        background: var(--surface3);
+        color: var(--text-muted);
+        font-size: 12px;
+        font-family: var(--font-display);
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: var(--tr);
+        white-space: nowrap;
+      }
+      .ep-refresh-btn:hover { background: var(--surface4); color: var(--text); border-color: var(--yellow); }
+      .ep-refresh-btn.loading svg { animation: epSpin 0.7s linear infinite; }
+      @keyframes epSpin { to { transform: rotate(360deg); } }
+
+      /* --- Posts area states --- */
+      .ep-empty-state, .ep-loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 14px;
+        font-family: var(--font-ui);
+      }
+      .ep-empty-state p, .ep-loading-state span {
+        font-size: 13px; color: var(--text-faint);
+        font-family: var(--font-display); font-weight: 600;
+        letter-spacing: 0.06em; text-transform: uppercase;
+      }
+      .ep-spinner {
+        width: 28px; height: 28px;
+        border: 2px solid var(--border-bright);
+        border-top-color: var(--yellow);
+        border-radius: 50%;
+        animation: epSpin 0.7s linear infinite;
+        margin-bottom: 14px;
+      }
+
+      /* --- Posts List --- */
+      #ep-posts-list { padding: 0; }
+      .ep-post-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border-light);
+        background: var(--surface);
+        transition: background var(--tr);
+      }
+      .ep-post-row:hover { background: var(--surface2); }
+      .ep-post-row:last-child { border-bottom: none; }
+      .ep-post-thumb {
+        width: 64px; height: 44px;
+        object-fit: cover;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        flex-shrink: 0;
+        display: block;
+      }
+      .ep-post-thumb-placeholder {
+        width: 64px; height: 44px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.4;
+      }
+      .ep-post-info { flex: 1; min-width: 0; overflow: hidden; }
+      .ep-post-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text);
+        white-space: normal;
+        word-break: break-word;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        margin-bottom: 5px;
+        line-height: 1.45;
+        letter-spacing: -0.01em;
+      }
+      .ep-post-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .ep-post-cat {
+        font-size: 10px;
+        font-family: var(--font-display);
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--yellow);
+        background: var(--yellow-glow);
+        border: 1px solid rgba(253,185,19,0.25);
+        padding: 2px 7px;
+      }
+      .ep-post-excerpt {
+        font-size: 11px;
+        color: var(--text-faint);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 320px;
+      }
+      .ep-post-row-num {
+        font-size: 11px;
+        font-family: var(--font-display);
+        font-weight: 700;
+        color: var(--text-faint);
+        letter-spacing: 0.06em;
+        min-width: 28px;
+        text-align: right;
+        flex-shrink: 0;
+      }
+      .ep-edit-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border: 1px solid var(--border-bright);
+        background: var(--surface2);
+        color: var(--text-muted);
+        font-size: 11px;
+        font-family: var(--font-display);
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: var(--tr);
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+      .ep-edit-btn:hover {
+        background: var(--yellow-glow);
+        border-color: var(--yellow);
+        color: var(--yellow);
+      }
+      .ep-edit-btn svg { stroke: currentColor; }
+      .ep-no-results {
+        padding: 40px 20px;
+        text-align: center;
+        font-size: 13px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+      }
+
+      /* --- Edit Modal --- */
+      .ep-modal-box {
+        max-width: 640px !important;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .ep-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      @media (max-width: 600px) { .ep-form-grid { grid-template-columns: 1fr; } }
+      .ep-field { display: flex; flex-direction: column; }
+      .ep-field-full { grid-column: 1 / -1; }
+      .ep-label {
+        display: block;
+        font-size: 10px;
+        font-family: var(--font-display);
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        margin-bottom: 6px;
+      }
+      .ep-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23e8edf5' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 32px !important;
+        cursor: pointer;
+      }
+      .ep-textarea-sm {
+        min-height: 80px !important;
+        resize: vertical !important;
+        line-height: 1.6 !important;
+      }
+
+      /* WYSIWYG Editor kwenye Edit Modal */
+      .ep-wysiwyg-wrap {
+        border: 1px solid var(--border-bright);
+        background: #ffffff;
+        transition: border-color var(--tr);
+      }
+      .ep-wysiwyg-wrap:focus-within { border-color: var(--yellow); }
+      .ep-wysiwyg-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 5px 8px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .ep-tb-btn {
+        display: flex; align-items: center; justify-content: center;
+        width: 28px; height: 28px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: #374151;
+        cursor: pointer;
+        font-size: 12px; font-weight: 700;
+        font-family: var(--font-ui);
+        border-radius: 3px;
+        transition: background 0.1s, border-color 0.1s;
+      }
+      .ep-tb-btn:hover { background: #e5e7eb; border-color: #d1d5db; }
+      .ep-tb-btn svg { stroke: #374151; }
+      .ep-tb-sep {
+        width: 1px; height: 20px;
+        background: #d1d5db;
+        margin: 0 4px;
+        flex-shrink: 0;
+      }
+      .ep-wysiwyg-body {
+        min-height: 280px;
+        max-height: 420px;
+        overflow-y: auto;
+        padding: 18px 20px;
+        outline: none;
+        font-size: 15px;
+        line-height: 1.85;
+        color: #1a1a1a;
+        font-family: var(--font-ui);
+        background: #ffffff;
+      }
+      .ep-wysiwyg-body:empty::before {
+        content: attr(data-placeholder);
+        color: #aab0bb;
+        font-style: italic;
+        pointer-events: none;
+      }
+      /* Styles zinazoakisi website halisi */
+      .ep-wysiwyg-body h1 {
+        font-size: 22px; font-weight: 700;
+        margin: 14px 0 6px;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 4px;
+        color: #111111;
+      }
+      .ep-wysiwyg-body h2 {
+        font-size: 18px; font-weight: 700;
+        margin: 12px 0 4px;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 3px;
+        color: #111111;
+      }
+      .ep-wysiwyg-body h3 {
+        font-size: 15px; font-weight: 700;
+        margin: 10px 0 4px; color: #111111;
+      }
+      .ep-wysiwyg-body p { margin: 6px 0; }
+      .ep-wysiwyg-body a { color: #2563eb; text-decoration: underline; }
+      .ep-wysiwyg-body strong, .ep-wysiwyg-body b { font-weight: 700; }
+      .ep-wysiwyg-body em, .ep-wysiwyg-body i { font-style: italic; }
+      .ep-wysiwyg-body ul, .ep-wysiwyg-body ol { padding-left: 24px; margin: 6px 0; }
+      .ep-wysiwyg-body li { margin: 3px 0; }
+      .ep-wysiwyg-body blockquote {
+        border-left: 3px solid #fdb913;
+        padding: 6px 16px;
+        color: #555;
+        margin: 12px 0;
+        background: #fffbf0;
+        font-style: italic;
+      }
+      .ep-wysiwyg-body img {
+        max-width: 100%;
+        display: block;
+        margin: 12px auto;
+        border-radius: 2px;
+      }
+      .ep-wysiwyg-body figure { margin: 14px 0; }
+      .ep-wysiwyg-body figcaption {
+        font-size: 12px; color: #888;
+        text-align: center; margin-top: 6px;
+        font-style: italic;
+      }
+      
+      .ep-field-hint {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 10px;
+        color: var(--text-faint);
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        margin-top: 6px;
+      }
+      .ep-field-hint svg { opacity: 0.6; flex-shrink: 0; stroke: currentColor; }
+      .ep-seo-lock-banner {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 11px 14px;
+        background: var(--ok-bg);
+        border: 1px solid rgba(34,197,94,0.3);
+        border-left: 3px solid var(--ok);
+        font-size: 12px;
+        color: var(--ok);
+        line-height: 1.6;
+      }
+      .ep-seo-lock-banner svg { flex-shrink: 0; margin-top: 2px; stroke: var(--ok); }
+      .ep-seo-lock-banner strong { display: block; font-weight: 700; margin-bottom: 2px; }
+      .ep-seo-lock-banner div { font-size: 11px; color: rgba(34,197,94,0.85); }
+
+      /* --- Confirm modal preview --- */
+      .ep-confirm-preview {
+        padding: 12px 14px;
+        background: var(--surface2);
+        border-left: 3px solid var(--yellow);
+        font-family: var(--font-display);
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.4;
+      }
+
+      /* Saving overlay */
+      .ep-saving-overlay {
+        position: fixed; inset: 0;
+        z-index: 999999;
+        background: rgba(4,10,22,0.7);
+        backdrop-filter: blur(4px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        color: var(--text);
+        font-family: var(--font-display);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .ep-saving-overlay .ep-spinner { margin-bottom: 0; }
+
     </style>
   </head>
   <body>
@@ -1498,6 +1944,41 @@
       </div>
     </div>
 
+    <!-- Restart Panel Modal -->
+    <div class="modal-overlay" id="restartModal">
+      <div class="modal-box">
+        <h4 style="color:var(--red)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Restart Panel
+        </h4>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;line-height:1.7">
+          Hii itafuta <strong style="color:var(--text)">kila kitu</strong> ulichoandika kwenye panel hii:
+        </p>
+        <div style="background:var(--red-bg);border:1px solid var(--red-light);padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--red);line-height:1.8;font-weight:500">
+          ✕ &nbsp;Picha kuu<br>
+          ✕ &nbsp;Category<br>
+          ✕ &nbsp;Headline<br>
+          ✕ &nbsp;Muhtasari<br>
+          ✕ &nbsp;Tags<br>
+          ✕ &nbsp;Makala yote<br>
+          ✕ &nbsp;Rasimu iliyohifadhiwa (localStorage)
+        </div>
+        <p style="font-size:12px;color:var(--text-faint);margin-bottom:18px;line-height:1.6;font-style:italic">
+          ⚠ Data yako kwenye Google Sheets <strong style="color:var(--ok)">HAITAFUTWA</strong> — panel tu ndiyo itaanza upya.
+        </p>
+        <p style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--red);margin-bottom:14px;text-align:center">
+          This process can't be undone 😂
+        </p>
+        <div class="modal-btns">
+          <button class="modal-cancel" onclick="closeModal('restartModal')">Hapana, Rudi</button>
+          <button class="modal-ok" style="background:var(--red);color:#fff" onmouseover="this.style.background='#a80e0e'" onmouseout="this.style.background='var(--red)'" onclick="restartPanel()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:5px;vertical-align:middle"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+            Ndiyo, Restart
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Image Cropper Modal -->
     <div class="modal-overlay" id="cropperModal">
       <div class="modal-box cropper-modal-box">
@@ -1537,16 +2018,24 @@
          TOP BAR
     ==================================================== -->
     <div id="topbar">
-      <img src="https://news.mnyilinga.co.tz/assets/main.logo.svg"
-           alt="Mnyilinga" class="topbar-logo"
-           onerror="this.style.display='none';document.querySelector('.topbar-logo-fallback').style.display='block'" />
-      <span class="topbar-logo-fallback" style="display:none;font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--yellow);letter-spacing:-0.02em">Mnyilinga</span>
+      <svg class="topbar-logo" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg" aria-label="Mnyilinga">
+        <polygon points="518.61 108.53 364.75 216.75 364.75 224.82 364.75 347.85 364.75 349.21 364.75 472.24 364.75 480.31 518.61 588.53 518.61 108.53" fill="#6e55dc"/>
+        <polygon points="560.17 588.53 714.03 480.31 714.03 349.21 714.03 347.85 714.03 216.75 560.17 108.53 560.17 588.53" fill="#fba007"/>
+        <polygon points="495.78 619.87 326.38 538.09 319.34 542.01 211.84 601.86 210.66 602.52 103.16 662.38 96.11 666.3 76.41 853.37 495.78 619.87" fill="#0eb24c"/>
+        <polygon points="96.63 889.69 266.03 971.47 380.57 907.69 381.75 907.04 496.3 843.26 516 656.19 96.63 889.69" fill="#fba007"/>
+        <polygon points="1003.59 844.26 979.99 657.64 972.87 653.86 864.15 596.26 862.95 595.63 754.23 538.03 747.1 534.25 579.44 619.54 1003.59 844.26" fill="#0eb24c"/>
+        <polygon points="559.98 656.28 583.58 842.9 699.43 904.27 700.63 904.91 816.47 966.28 984.13 880.99 559.98 656.28" fill="#6e55dc"/>
+      </svg>
       <div class="topbar-sep"></div>
       <div class="topbar-badge">Admin Panel</div>
       <div class="topbar-spacer"></div>
       <div class="topbar-actions">
         <div id="topbar-save-status">✓ Imehifadhiwa</div>
         <span class="topbar-time" id="topbar-clock"></span>
+        <button class="topbar-restart-btn" onclick="openModal('restartModal')" title="Restart Panel — futa kila kitu">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          Restart
+        </button>
       </div>
     </div>
 
@@ -1616,8 +2105,14 @@
       <div id="main-content">
         <div class="page-header">
           <div class="page-tabs">
-            <div class="page-tab active">Andika</div>
-            <div class="page-tab" onclick="previewArticle()">Hakiki</div>
+            <div class="page-tab active" id="tab-andika" onclick="switchTab('andika')">Andika</div>
+            <div class="page-tab" id="tab-hakiki" onclick="switchTab('hakiki')">Hakiki</div>
+            <div class="page-tab" id="tab-edit-posts" onclick="switchTab('edit-posts')">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:5px;vertical-align:middle">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/>
+              </svg>Hariri Machapisho
+            </div>
           </div>
         </div>
 
@@ -1861,6 +2356,150 @@
         </div>
       </div>
       <!-- /main-content -->
+
+      <!-- ====================================================
+           EDIT POSTS VIEW (hidden by default)
+      ==================================================== -->
+      <div id="edit-posts-view" style="display:none;">
+        <!-- Header bar with search -->
+        <div class="ep-topbar">
+          <div class="ep-topbar-left">
+            <div class="ep-count-badge" id="ep-count-badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+              <span id="ep-count-text">— machapisho</span>
+            </div>
+          </div>
+          <div class="ep-search-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="ep-search" placeholder="Tafuta kwa kichwa au maudhui..." oninput="epFilterPosts()" />
+            <button class="ep-search-clear" id="ep-search-clear" onclick="epClearSearch()" style="display:none" title="Futa utafutaji">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <button class="ep-refresh-btn" onclick="epLoadPosts()" id="ep-refresh-btn" title="Refresh machapisho">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <!-- Posts list area -->
+        <div id="ep-posts-area">
+          <div class="ep-empty-state" id="ep-empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:.25;margin-bottom:12px"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            <p id="ep-empty-msg">Bonyeza Refresh kupakia machapisho</p>
+          </div>
+          <div id="ep-loading" style="display:none" class="ep-loading-state">
+            <div class="ep-spinner"></div>
+            <span>Inapakia machapisho...</span>
+          </div>
+          <div id="ep-posts-list"></div>
+        </div>
+      </div>
+
+      <!-- ====================================================
+           EDIT MODAL
+      ==================================================== -->
+      <div class="modal-overlay" id="editPostModal">
+        <div class="modal-box ep-modal-box">
+          <h4>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;vertical-align:middle"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+            Hariri Chapisho
+          </h4>
+          <div class="ep-form-grid">
+            <div class="ep-field">
+              <label class="ep-label">Kichwa cha Habari (Headline)</label>
+              <input type="text" class="modal-input" id="ep-edit-headline" placeholder="Headline ya habari..." maxlength="120" />
+            </div>
+            <div class="ep-field">
+              <label class="ep-label">Category</label>
+              <select class="modal-input ep-select" id="ep-edit-category">
+                <option value="">-- Chagua --</option>
+                <option>Technology</option><option>Mapenzi</option><option>Afya</option>
+                <option>Uchumi</option><option>Burudani</option><option>Michezo</option>
+                <option>Siasa</option><option>Elimu</option><option>Matukio</option><option>Lifestyle</option>
+              </select>
+            </div>
+            <div class="ep-field ep-field-full">
+              <label class="ep-label">Muhtasari (Excerpt / SEO Description)</label>
+              <textarea class="modal-input ep-textarea-sm" id="ep-edit-excerpt" placeholder="Maelezo mafupi ya habari..." maxlength="200"></textarea>
+            </div>
+            <div class="ep-field ep-field-full">
+              <label class="ep-label">Tags <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-faint)">(tenganisha kwa koma)</span></label>
+              <input type="text" class="modal-input" id="ep-edit-tags" placeholder="tag1, tag2, tag3" />
+            </div>
+            <div class="ep-field ep-field-full">
+              <div class="ep-seo-lock-banner">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                <div>
+                  <strong>Picha Kuu na Vichwa (H1/H2/H3) vinalindwa</strong><br>
+                  Haziwezi kubadilishwa hapa — zinabaki kama zilivyochapishwa asili ili kulinda SEO yako.
+                </div>
+              </div>
+            </div>
+            <div class="ep-field ep-field-full">
+              <label class="ep-label">Maudhui ya Makala</label>
+              <div class="ep-wysiwyg-wrap">
+                <div class="ep-wysiwyg-toolbar">
+                  <button class="ep-tb-btn" onmousedown="return false" onclick="epFmt('bold')" title="Bold"><b>B</b></button>
+                  <button class="ep-tb-btn" onmousedown="return false" onclick="epFmt('italic')" title="Italic"><i>I</i></button>
+                  <button class="ep-tb-btn" onmousedown="return false" onclick="epFmt('underline')" title="Underline"><u>U</u></button>
+                  <span class="ep-tb-sep"></span>
+                  <button class="ep-tb-btn" onmousedown="return false" onclick="epFmt('insertUnorderedList')" title="Orodha">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
+                  </button>
+                  <span class="ep-tb-sep"></span>
+                  <button class="ep-tb-btn" onmousedown="return false" onclick="epFmt('undo')" title="Undo">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                  </button>
+                  <button class="ep-tb-btn" onmousedown="return false" onclick="epFmt('redo')" title="Redo">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                  </button>
+                </div>
+                <div class="ep-wysiwyg-body" id="ep-edit-article-wysiwyg" contenteditable="true"
+                     data-placeholder="Maudhui ya makala..."></div>
+              </div>
+              <div class="ep-field-hint">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Unaona nakala halisi kama inavyoonekana kwenye website. H1/H2/H3 zinalindwa otomatiki.
+              </div>
+            </div>
+          </div>
+          <div class="modal-btns" style="margin-top:20px">
+            <button class="modal-cancel" onclick="epCloseEditModal()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Kanseli
+            </button>
+            <button class="modal-ok" onclick="epAskConfirm()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:5px;vertical-align:middle"><polyline points="20 6 9 17 4 12"/></svg>
+              Hifadhi Mabadiliko
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirmation Modal -->
+      <div class="modal-overlay" id="epConfirmModal">
+        <div class="modal-box">
+          <h4>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;vertical-align:middle;color:var(--warn)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Una Uhakika?
+          </h4>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;line-height:1.7">
+            Unakusudia kubadilisha chapisho hili kwenye Google Sheets:
+          </p>
+          <div class="ep-confirm-preview" id="ep-confirm-preview"></div>
+          <p style="font-size:12px;color:var(--text-faint);margin-top:12px;margin-bottom:18px;line-height:1.6">
+            Mabadiliko haya yatasasishwa moja kwa moja kwenye database. Hakikisha taarifa ni sahihi kabla ya kuthibitisha.
+          </p>
+          <div class="modal-btns">
+            <button class="modal-cancel" onclick="closeModal('epConfirmModal')">Hapana, Rudi</button>
+            <button class="modal-ok" id="ep-confirm-save-btn" onclick="epSavePost()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px;vertical-align:middle"><polyline points="20 6 9 17 4 12"/></svg>
+              Ndiyo, Hifadhi
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- RIGHT INFO PANEL -->
       <aside id="info-panel">
@@ -2689,7 +3328,7 @@
       //  PUBLISH
       // ============================================================
       async function handlePublish() {
-        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbxRU38CN-Xnu7FOokZ7bzKXrxljegpDtpUPmRWCm06zBDEFfUl0ftbOlNUUNX_nAs5u/exec";
+        const GOOGLE_URL = "https://api.mnyilinga.co.tz/api/data";
         const coverFile = fileInput.files[0];
         const category = catSelected.textContent;
         const headlineText = document.getElementById("headline").value.trim();
@@ -2741,6 +3380,424 @@
           document.getElementById("verify").checked = false;
         }
       }
+      // ============================================================
+      //  TAB SWITCHING — Enhanced to support Edit Posts tab
+      // ============================================================
+      function switchTab(tab) {
+        const tabAndika = document.getElementById("tab-andika");
+        const tabHakiki = document.getElementById("tab-hakiki");
+        const tabEditPosts = document.getElementById("tab-edit-posts");
+        const mainSections = document.querySelectorAll(
+          "#sec-cover,#sec-cat,#sec-headline,#sec-excerpt,#sec-tags,#sec-article,.publish-section"
+        );
+        const editView = document.getElementById("edit-posts-view");
+
+        // Reset all tabs
+        [tabAndika, tabHakiki, tabEditPosts].forEach(t => t && t.classList.remove("active"));
+
+        if (tab === "edit-posts") {
+          tabEditPosts.classList.add("active");
+          mainSections.forEach(s => { if(s) s.style.display = "none"; });
+          editView.style.display = "block";
+          // Auto-load if not loaded yet
+          if (!epState.loaded) epLoadPosts();
+        } else if (tab === "hakiki") {
+          tabHakiki.classList.add("active");
+          mainSections.forEach(s => { if(s) s.style.display = ""; });
+          editView.style.display = "none";
+          previewArticle();
+        } else {
+          tabAndika.classList.add("active");
+          mainSections.forEach(s => { if(s) s.style.display = ""; });
+          editView.style.display = "none";
+        }
+      }
+
+      // ============================================================
+      //  EDIT POSTS SYSTEM
+      // ============================================================
+      // ⚙ CONFIG — badilisha URL hii kulingana na Google Apps Script yako
+      const EP_API_URL = "https://api.mnyilinga.co.tz/api/data";
+
+      const epState = {
+        posts: [],       // all posts from API
+        filtered: [],    // after search filter
+        editing: null,   // current post being edited {rowId, ...fields}
+        loaded: false,
+      };
+
+      // -- Load posts from Google Sheets API --
+      async function epLoadPosts() {
+        const refreshBtn = document.getElementById("ep-refresh-btn");
+        const loading = document.getElementById("ep-loading");
+        const emptyState = document.getElementById("ep-empty-state");
+        const postsList = document.getElementById("ep-posts-list");
+
+        // UI: loading state
+        refreshBtn.classList.add("loading");
+        loading.style.display = "flex";
+        emptyState.style.display = "none";
+        postsList.innerHTML = "";
+        document.getElementById("ep-count-text").textContent = "Inapakia...";
+
+        try {
+          const res = await fetch(EP_API_URL + "?action=getPosts", {
+            method: "GET",
+            cache: "no-cache",
+          });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const data = await res.json();
+
+          // Support both array or {posts: [...]} format
+          const posts = Array.isArray(data) ? data : (data.posts || data.data || []);
+
+          epState.posts = posts;
+          epState.filtered = [...posts];
+          epState.loaded = true;
+
+          epRenderPosts(epState.filtered);
+          const c = posts.length;
+          document.getElementById("ep-count-text").textContent = `${c} chapisho${c !== 1 ? "" : ""}`;
+        } catch (err) {
+          loading.style.display = "none";
+          emptyState.style.display = "flex";
+          document.getElementById("ep-empty-msg").textContent = "Hitilafu: " + err.message + " — Angalia URL ya API";
+          document.getElementById("ep-count-text").textContent = "Hitilafu";
+          toast("❌ Imeshindwa kupakia: " + err.message, "error", 6000);
+        } finally {
+          refreshBtn.classList.remove("loading");
+        }
+      }
+
+      // -- Render posts to DOM --
+      function epRenderPosts(posts) {
+        const loading = document.getElementById("ep-loading");
+        const emptyState = document.getElementById("ep-empty-state");
+        const postsList = document.getElementById("ep-posts-list");
+
+        loading.style.display = "none";
+
+        if (!posts || posts.length === 0) {
+          postsList.innerHTML = "";
+          if (document.getElementById("ep-search").value.trim()) {
+            postsList.innerHTML = `<div class="ep-no-results">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:.2;display:block;margin:0 auto 10px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Hakuna matokeo kwa utafutaji huu
+            </div>`;
+          } else {
+            emptyState.style.display = "flex";
+            document.getElementById("ep-empty-msg").textContent = "Hakuna machapisho yaliyopatikana";
+          }
+          document.getElementById("ep-count-text").textContent = "0 machapisho";
+          return;
+        }
+
+        emptyState.style.display = "none";
+        document.getElementById("ep-count-text").textContent =
+          posts.length + " / " + epState.posts.length + " machapisho";
+
+        postsList.innerHTML = posts.map((post, i) => {
+          const headline = epSafe(post.headline || post.title || post.Headline || post.Title || "Bila kichwa");
+          const category = epSafe(post.category || post.Category || "");
+          const excerpt = epSafe(post.excerpt || post.Excerpt || post.muhtasari || "");
+          const imageUrl = epSafe(post.picha_url || post.image || post.Image || post.picha || "");
+          const rowId = post.rowId || post.id || post.row || (i + 2); // row 2 = first data row
+
+          const thumbHtml = imageUrl
+            ? `<img class="ep-post-thumb" src="${imageUrl}" alt="${headline}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+              + `<div class="ep-post-thumb-placeholder" style="display:none">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>`
+            : `<div class="ep-post-thumb-placeholder">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>`;
+
+          const catBadge = category
+            ? `<span class="ep-post-cat">${category}</span>`
+            : "";
+
+          return `<div class="ep-post-row">
+            <span class="ep-post-row-num">#${rowId}</span>
+            ${thumbHtml}
+            <div class="ep-post-info">
+              <div class="ep-post-title" title="${headline}">${headline}</div>
+              <div class="ep-post-meta">
+                ${catBadge}
+                ${excerpt ? `<span class="ep-post-excerpt">${excerpt.substring(0,90)}${excerpt.length>90?"…":""}</span>` : ""}
+              </div>
+            </div>
+            <button class="ep-edit-btn" data-ep-idx="${i}" onclick="epOpenEditModal(this)">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+              Edit
+            </button>
+          </div>`;
+        }).join("");
+      }
+
+      // -- Real-time search filter --
+      function epFilterPosts() {
+        const q = document.getElementById("ep-search").value.trim().toLowerCase();
+        const clearBtn = document.getElementById("ep-search-clear");
+        clearBtn.style.display = q ? "flex" : "none";
+
+        if (!q) {
+          epState.filtered = [...epState.posts];
+        } else {
+          epState.filtered = epState.posts.filter(post => {
+            const headline = (post.headline || post.title || post.Headline || post.Title || "").toLowerCase();
+            const content = (post.article || post.content || post.Article || "").toLowerCase();
+            const excerpt = (post.excerpt || post.Excerpt || "").toLowerCase();
+            const category = (post.category || post.Category || "").toLowerCase();
+            const tags = (post.tags || post.Tags || "").toLowerCase();
+            return headline.includes(q) || content.includes(q) || excerpt.includes(q)
+                   || category.includes(q) || tags.includes(q);
+          });
+        }
+        epRenderPosts(epState.filtered);
+      }
+
+      function epClearSearch() {
+        document.getElementById("ep-search").value = "";
+        epFilterPosts();
+        document.getElementById("ep-search").focus();
+      }
+
+      // -- Open Edit Modal --
+      function epOpenEditModal(btn) {
+        const idx = parseInt(btn.getAttribute("data-ep-idx"), 10);
+        const post = epState.filtered[idx];
+        if (!post) { toast("Hitilafu: chapisho halipatikani", "error"); return; }
+
+        const rowId = post.rowId || post.id || post.row || (idx + 2);
+        epState.editing = { ...post, rowId };
+
+        // Extract & store original headings for SEO protection
+        const articleHTML = post.article || post.content || post.Article || "";
+        epState.editing._originalHeadings = epExtractHeadings(articleHTML);
+
+        // Fill form
+        document.getElementById("ep-edit-headline").value =
+          post.headline || post.title || post.Headline || post.Title || "";
+        document.getElementById("ep-edit-excerpt").value =
+          post.excerpt || post.Excerpt || post.muhtasari || "";
+        document.getElementById("ep-edit-tags").value =
+          post.tags || post.Tags || "";
+        // Load article into WYSIWYG
+        const wysiwyg = document.getElementById("ep-edit-article-wysiwyg");
+        wysiwyg.innerHTML = articleHTML;
+
+        // Category select
+        const catSelect = document.getElementById("ep-edit-category");
+        const catVal = post.category || post.Category || "";
+        catSelect.value = catVal;
+        if (!catSelect.value) catSelect.value = "";
+
+        openModal("editPostModal");
+      }
+
+      // -- WYSIWYG toolbar formatter --
+      function epFmt(cmd) {
+        document.getElementById("ep-edit-article-wysiwyg").focus();
+        document.execCommand(cmd, false, null);
+      }
+
+      function epCloseEditModal() {
+        closeModal("editPostModal");
+        document.getElementById("ep-edit-article-wysiwyg").innerHTML = "";
+        epState.editing = null;
+      }
+
+      // -- Ask confirmation before saving --
+      function epAskConfirm() {
+        const headline = document.getElementById("ep-edit-headline").value.trim();
+        if (!headline) { toast("⚠ Kichwa cha habari hakiwezi kuwa wazi!", "warn"); return; }
+        document.getElementById("ep-confirm-preview").textContent =
+          '"' + headline + '"';
+        closeModal("editPostModal");
+        openModal("epConfirmModal");
+      }
+
+      // -- Save post to Google Sheets --
+      async function epSavePost() {
+        closeModal("epConfirmModal");
+
+        const savingOverlay = document.createElement("div");
+        savingOverlay.className = "ep-saving-overlay";
+        savingOverlay.innerHTML = `<div class="ep-spinner"></div><span>Inahifadhi...</span>`;
+        document.body.appendChild(savingOverlay);
+
+        // Soma maudhui kutoka WYSIWYG editor
+        let articleContent = document.getElementById("ep-edit-article-wysiwyg").innerHTML.trim();
+        if (epState.editing._originalHeadings) {
+          articleContent = epRestoreHeadings(articleContent, epState.editing._originalHeadings);
+        }
+
+        const payload = {
+          action:   "updatePost",
+          rowId:    epState.editing.rowId,
+          headline: document.getElementById("ep-edit-headline").value.trim(),
+          category: document.getElementById("ep-edit-category").value,
+          excerpt:  document.getElementById("ep-edit-excerpt").value.trim(),
+          tags:     document.getElementById("ep-edit-tags").value.trim(),
+          article:  articleContent,
+          // picha_url haijumuishwi — inalindwa
+        };
+
+        try {
+          const res = await fetch(EP_API_URL, {
+            method:   "POST",
+            redirect: "follow",
+            headers:  { "Content-Type": "text/plain;charset=utf-8" },
+            body:     JSON.stringify(payload),
+          });
+
+          const json = await res.json();
+
+          // Gundua kama redirect ilitokea (GAS ilirudisha array badala ya object)
+          if (Array.isArray(json)) {
+            throw new Error("Redirect ilitokea — GAS haikupokea POST. Angalia Worker deployment.");
+          }
+
+          // Angalia error wazi
+          if (json.result === "error") {
+            throw new Error(json.message || "GAS ilikataa ombi");
+          }
+
+          // Thibitisha mafanikio wazi
+          if (json.result !== "success") {
+            throw new Error("Jibu lisilo wazi kutoka GAS: " + JSON.stringify(json));
+          }
+
+          // Update local state
+          const idx = epState.posts.findIndex(p =>
+            (p.rowId || p.id || p.row) == epState.editing.rowId
+          );
+          if (idx !== -1) {
+            epState.posts[idx] = {
+              ...epState.posts[idx],
+              headline: payload.headline,
+              category: payload.category,
+              excerpt:  payload.excerpt,
+              tags:     payload.tags,
+              article:  payload.article,
+            };
+            epFilterPosts();
+          }
+
+          epState.editing = null;
+          toast("✓ Imehifadhiwa! (Row #" + payload.rowId + ")", "ok", 4000);
+
+        } catch (err) {
+          toast("❌ Hitilafu: " + err.message, "error", 7000);
+        } finally {
+          savingOverlay.remove();
+        }
+      }
+
+      // -- Extract H1/H2/H3 from article HTML (SEO protection) --
+      function epExtractHeadings(html) {
+        const headings = [];
+        const regex = /<h([1-3])[^>]*>([\s\S]*?)<\/h[1-3]>/gi;
+        let match;
+        while ((match = regex.exec(html)) !== null) {
+          headings.push({ level: match[1], full: match[0] });
+        }
+        return headings;
+      }
+
+      // -- Restore original H1/H2/H3 into edited article (SEO protection) --
+      function epRestoreHeadings(editedHtml, originalHeadings) {
+        if (!originalHeadings || originalHeadings.length === 0) return editedHtml;
+        // Remove any headings the user may have typed/edited
+        let cleaned = editedHtml.replace(/<h[1-3][^>]*>[\s\S]*?<\/h[1-3]>/gi, "___HEADING___");
+        // Re-insert originals in order
+        let i = 0;
+        cleaned = cleaned.replace(/___HEADING___/g, () => {
+          return originalHeadings[i] ? originalHeadings[i++].full : "";
+        });
+        // If originals remain unused (user deleted heading placeholders), prepend them
+        const remaining = originalHeadings.slice(i).map(h => h.full).join("");
+        return remaining ? remaining + cleaned : cleaned;
+      }
+
+      // -- Utility: safe HTML encode --
+      function epSafe(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      // ============================================================
+      //  RESTART PANEL
+      // ============================================================
+      function restartPanel() {
+        closeModal("restartModal");
+
+        // 1. Clear cover image
+        const previewImg = document.getElementById("preview-img");
+        const coverDeleteBtn = document.getElementById("cover-delete-btn");
+        const coverInfo = document.getElementById("cover-info");
+        const fileInput = document.getElementById("file-input");
+        if (previewImg) { previewImg.src = "#"; previewImg.style.display = "none"; }
+        if (coverDeleteBtn) coverDeleteBtn.style.display = "none";
+        if (coverInfo) { coverInfo.style.display = "none"; coverInfo.classList.remove("visible"); }
+        if (fileInput) fileInput.value = "";
+
+        // 2. Reset category
+        const catSelected = document.getElementById("catSelected");
+        if (catSelected) catSelected.textContent = "Chagua category...";
+        document.querySelectorAll("input[name='category']").forEach(r => r.checked = false);
+        const catList = document.getElementById("catList");
+        const catTrigger = document.getElementById("catTrigger");
+        if (catList) catList.classList.remove("show");
+        if (catTrigger) catTrigger.classList.remove("open");
+        const ipCat = document.getElementById("ip-cat");
+        if (ipCat) ipCat.textContent = "—";
+
+        // 3. Clear headline
+        const headline = document.getElementById("headline");
+        if (headline) { headline.value = ""; updateCharCount(); }
+
+        // 4. Clear excerpt
+        const excerpt = document.getElementById("excerpt");
+        if (excerpt) { excerpt.value = ""; updateExcerptCount(); }
+
+        // 5. Clear tags
+        const tagsWrap = document.getElementById("tags-wrap");
+        if (tagsWrap) {
+          tagsWrap.querySelectorAll(".tag-chip").forEach(chip => chip.remove());
+        }
+        const tagInput = document.getElementById("tag-input");
+        if (tagInput) tagInput.value = "";
+        if (typeof tagsData !== "undefined") tagsData.clear();
+
+        // 6. Clear editor
+        const editor = document.getElementById("editor");
+        if (editor) { editor.innerHTML = ""; updateWordCount(); }
+
+        // 7. Clear localStorage draft
+        localStorage.removeItem("mnyilinga_draft");
+
+        // 8. Reset publish button & verify checkbox
+        const verify = document.getElementById("verify");
+        const submitBtn = document.getElementById("submitBtn");
+        if (verify) verify.checked = false;
+        if (submitBtn) submitBtn.disabled = true;
+
+        // 9. Reset SEO preview
+        updateSeoPreview && updateSeoPreview();
+
+        // 10. Switch back to Andika tab
+        switchTab("andika");
+
+        // 11. Scroll to top
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        toast("✓ Panel imeanza upya", "ok", 3000);
+      }
+
     </script>
   </body>
 </html>
