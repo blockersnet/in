@@ -1016,7 +1016,7 @@ header {
 /* ============================================================
    CONFIG
    ============================================================ */
-const SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbx0qjgp4HUGD8EY3V55Fc9QwxiTDgpnLCAT1fNPgP9r6AhCZ2rds0FWSVcwB5TpaFScRQ/exec";
+const SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbx2HiyE1su4WQVqW8ncqo2d5u-AsFs4NGk9Ks2Tz_UTC0tq7SRX1vCeC9Yi1HoKdGNd1w/exec";
 const LATEST_LIMIT = 30;
 const REFRESH_SEC  = 300; // 5 minutes
 const INFINITE_BATCH = 10; // how many to append each time
@@ -1095,18 +1095,36 @@ const MONTH_NAMES_SW = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ago','Sep','O
 
 function parseDate(rawTime) {
     if (!rawTime) return null;
+
+    // PRIMARY: ISO strings ("2026-04-23T11:30:00.000Z") — returned by the
+    // updated GAS backend. new Date() handles these perfectly in all browsers.
     let date = new Date(rawTime);
+
+    // FALLBACK A: "dd/MM/yyyy HH:mm" or "dd-MM-yyyy HH:mm"
     if (isNaN(date.getTime())) {
         const m = String(rawTime).match(
             /^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})[,\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?/
         );
-        if (m) date = new Date(parseInt(m[3]), parseInt(m[2])-1, parseInt(m[1]), parseInt(m[4]), parseInt(m[5]), parseInt(m[6]||0));
+        if (m) date = new Date(
+            parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1]),
+            parseInt(m[4]), parseInt(m[5]), parseInt(m[6] || 0)
+        );
     }
+
+    // FALLBACK B: "dd/MM/yyyy" (date only)
     if (isNaN(date.getTime())) {
         const m = String(rawTime).match(/^(\d{1,2})[\/](\d{1,2})[\/](\d{4})/);
-        if (m) date = new Date(parseInt(m[3]), parseInt(m[1])-1, parseInt(m[2]));
+        if (m) date = new Date(parseInt(m[3]), parseInt(m[1]) - 1, parseInt(m[2]));
     }
-    return isNaN(date.getTime()) ? null : date;
+
+    if (isNaN(date.getTime())) return null;
+
+    // SANITY CHECK: reject clearly wrong dates (before 2020 or > 5 years ahead).
+    // This catches the "1990+" bug caused by GAS returning garbage date values.
+    const yr = date.getFullYear();
+    if (yr < 2020 || yr > new Date().getFullYear() + 5) return null;
+
+    return date;
 }
 
 function formatTime(rawTime) {
@@ -1362,34 +1380,72 @@ const infiniteObserver = new IntersectionObserver((entries) => {
 infiniteObserver.observe(sentinel);
 
 /* ============================================================
-   FETCH DATA
+   FETCH DATA — Smart Refresh
+   isRefresh=false → first load (full render, spinner inaonekana)
+   isRefresh=true  → background diff (hakuna flicker, hakuna re-render)
    ============================================================ */
-async function loadData() {
+async function loadData(isRefresh = false) {
     const loader     = document.getElementById('loader');
     const errorState = document.getElementById('error-state');
     const timer      = document.getElementById('update-timer');
 
     errorState.style.display = 'none';
-    timer.classList.add('refreshing');
 
-    if (!allMessages.length) loader.style.display = 'flex';
+    // Spinner na refreshing indicator — first load peke yake
+    if (!isRefresh) {
+        timer.classList.add('refreshing');
+        if (!allMessages.length) loader.style.display = 'flex';
+    }
 
     try {
-        const res  = await fetch(SCRIPT_URL + '?t=' + Date.now());
-        const data = await res.json();
+        const res      = await fetch(SCRIPT_URL + '?t=' + Date.now());
+        const data     = await res.json();
+        const incoming = [...data].reverse();
 
-        allMessages = [...data].reverse();
-        loader.style.display = 'none';
+        // ── FIRST LOAD ──────────────────────────────────────
+        if (!isRefresh || allMessages.length === 0) {
+            allMessages = incoming;
+            loader.style.display = 'none';
+            if (lastQuery) performSearch(lastQuery);
+            else renderUI(allMessages, '');
+            return;
+        }
 
-        if (lastQuery) performSearch(lastQuery);
-        else renderUI(allMessages, '');
+        // ── SMART REFRESH (background diff) ─────────────────
+        // Tafuta tu messages ambazo bado hazipo kwenye allMessages
+        const existingIds = new Set(allMessages.map(m => String(m.id)));
+        const brandNew    = incoming.filter(m => !existingIds.has(String(m.id)));
+
+        if (brandNew.length === 0) {
+            // Hakuna mpya — usifanye chochote. Zero flicker, zero re-render.
+            return;
+        }
+
+        // Ongeza mpya kwenye top bila kugusa zilizopo
+        allMessages = [...brandNew, ...allMessages];
+
+        if (!lastQuery) {
+            const grid = document.getElementById('message-grid');
+            // Insert kwa reverse ili ya kwanza iwe juu
+            [...brandNew].reverse().forEach((msg, i) => {
+                const card = createCard(msg, i, '');
+                card.style.animationDelay = `${i * 0.05}s`;
+                grid.insertBefore(card, grid.firstChild);
+            });
+        } else {
+            // User anasearch — update data tu, usivunje search results
+            performSearch(lastQuery);
+        }
+
+        const label = brandNew.length === 1 ? 'siri mpya 1' : `siri mpya ${brandNew.length}`;
+        showToast(`✨ ${label} imeongezwa!`);
 
     } catch (err) {
         loader.style.display = 'none';
         if (!allMessages.length) errorState.style.display = 'block';
         console.error('[SiriBoard]', err);
     } finally {
-        timer.classList.remove('refreshing');
+        if (!isRefresh) timer.classList.remove('refreshing');
     }
 }
 
@@ -1722,7 +1778,7 @@ setInterval(() => {
         if (expandedCount === 0) {
             timeLeft = REFRESH_SEC;
             pendingRefresh = false;
-            loadData();
+            loadData(true); // true = smart background refresh, hakuna flicker
         } else {
             pendingRefresh = true;
         }
